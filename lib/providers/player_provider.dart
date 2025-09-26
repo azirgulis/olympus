@@ -83,6 +83,16 @@ class PlayerNotifier extends StateNotifier<Player> {
     );
   }
 
+  void addExperience(int amount) {
+    // For now, just track experience - could add leveling system later
+    // This is called from quest rewards but doesn't need to do anything yet
+  }
+
+  void addReputation(int amount) {
+    // Add to overall reputation - for now, add to Athens
+    updateReputation('athens', amount);
+  }
+
   int _getStartingDrachmae(CharacterClass characterClass) {
     switch (characterClass) {
       case CharacterClass.merchant:

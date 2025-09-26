@@ -5,8 +5,10 @@ import '../../providers/player_provider.dart';
 import '../../providers/market_provider.dart';
 import '../../providers/game_state_provider.dart';
 import '../../providers/simple_save_provider.dart';
+import '../../providers/quest_provider.dart';
 import '../../widgets/game_ui/resource_bar.dart';
 import '../market_screen.dart';
+import '../quest_screen.dart';
 
 class AthensScreen extends ConsumerStatefulWidget {
   const AthensScreen({super.key});
@@ -33,6 +35,8 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
   Widget build(BuildContext context) {
     final player = ref.watch(playerProvider);
     final gameState = ref.watch(gameStateProvider);
+    final availableQuests = ref.watch(availableQuestsProvider);
+    final activeQuests = ref.watch(activeQuestsProvider);
     final isFirstVisit = !(gameState.completedTutorials['athens_intro'] ?? false);
 
     return Scaffold(
@@ -204,11 +208,9 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
                             Icons.sailing,
                             () => _showComingSoon('Harbor'),
                           ),
-                          _buildActionCard(
-                            'Quests',
-                            'Help citizens\nEarn rewards',
-                            Icons.assignment,
-                            () => _showComingSoon('Quest Board'),
+                          _buildQuestActionCard(
+                            availableQuests.length,
+                            activeQuests.length,
                           ),
                         ],
                       ),
@@ -340,6 +342,100 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
     );
   }
 
+  Widget _buildQuestActionCard(int availableCount, int activeCount) {
+    return GestureDetector(
+      onTap: () => _navigateToQuests(),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF8B4513), width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.assignment,
+                  size: 40,
+                  color: const Color(0xFF8B4513),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Quests',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF8B4513),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Help citizens\nEarn rewards',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: const Color(0xFF8B4513).withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
+            ),
+            // Notification badges
+            if (availableCount > 0)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '$availableCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            if (activeCount > 0)
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '$activeCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildNPCSection() {
     return Container(
       width: double.infinity,
@@ -405,6 +501,14 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const MarketScreen(locationId: 'athens'),
+      ),
+    );
+  }
+
+  void _navigateToQuests() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const QuestScreen(),
       ),
     );
   }

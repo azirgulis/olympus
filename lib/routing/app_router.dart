@@ -4,6 +4,7 @@ import '../screens/character_selection_screen.dart';
 import '../screens/game_map_screen.dart';
 import '../screens/locations/athens_screen.dart';
 import '../screens/save_load_screen.dart';
+import '../screens/quest_screen.dart';
 
 final appRouter = GoRouter(
   routes: [
@@ -34,6 +35,11 @@ final appRouter = GoRouter(
         final mode = state.uri.queryParameters['mode'];
         return SaveLoadScreen(isLoadMode: mode == 'load');
       },
+    ),
+    GoRoute(
+      path: '/quests',
+      name: 'quests',
+      builder: (context, state) => const QuestScreen(),
     ),
   ],
 );
