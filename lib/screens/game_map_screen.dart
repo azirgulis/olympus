@@ -132,8 +132,8 @@ class GameMapScreen extends ConsumerWidget {
 
               // Bottom Inventory Preview
               Container(
-                height: 100,
-                padding: const EdgeInsets.all(16),
+                height: 80,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.3),
                   borderRadius: const BorderRadius.only(
@@ -148,7 +148,7 @@ class GameMapScreen extends ConsumerWidget {
                       'Inventory',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -160,27 +160,28 @@ class GameMapScreen extends ConsumerWidget {
                         itemBuilder: (context, index) {
                           final item = inventory.items[index];
                           return Container(
-                            width: 60,
-                            margin: const EdgeInsets.only(right: 8),
+                            width: 50,
+                            margin: const EdgeInsets.only(right: 6),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                               border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   _getItemIcon(item.type),
                                   color: Colors.white,
-                                  size: 20,
+                                  size: 16,
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 2),
                                 Text(
                                   '${item.quantity}',
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 12,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
