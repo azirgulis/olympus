@@ -25,6 +25,8 @@ mixin _$Player {
   int get health => throw _privateConstructorUsedError;
   int get energy => throw _privateConstructorUsedError;
   int get drachmae => throw _privateConstructorUsedError;
+  int get level => throw _privateConstructorUsedError;
+  int get experience => throw _privateConstructorUsedError;
   Map<String, int> get reputation => throw _privateConstructorUsedError;
   Map<String, int> get skills => throw _privateConstructorUsedError;
   String get currentLocation => throw _privateConstructorUsedError;
@@ -52,6 +54,8 @@ abstract class $PlayerCopyWith<$Res> {
       int health,
       int energy,
       int drachmae,
+      int level,
+      int experience,
       Map<String, int> reputation,
       Map<String, int> skills,
       String currentLocation,
@@ -80,6 +84,8 @@ class _$PlayerCopyWithImpl<$Res, $Val extends Player>
     Object? health = null,
     Object? energy = null,
     Object? drachmae = null,
+    Object? level = null,
+    Object? experience = null,
     Object? reputation = null,
     Object? skills = null,
     Object? currentLocation = null,
@@ -107,6 +113,14 @@ class _$PlayerCopyWithImpl<$Res, $Val extends Player>
       drachmae: null == drachmae
           ? _value.drachmae
           : drachmae // ignore: cast_nullable_to_non_nullable
+              as int,
+      level: null == level
+          ? _value.level
+          : level // ignore: cast_nullable_to_non_nullable
+              as int,
+      experience: null == experience
+          ? _value.experience
+          : experience // ignore: cast_nullable_to_non_nullable
               as int,
       reputation: null == reputation
           ? _value.reputation
@@ -149,6 +163,8 @@ abstract class _$$PlayerImplCopyWith<$Res> implements $PlayerCopyWith<$Res> {
       int health,
       int energy,
       int drachmae,
+      int level,
+      int experience,
       Map<String, int> reputation,
       Map<String, int> skills,
       String currentLocation,
@@ -175,6 +191,8 @@ class __$$PlayerImplCopyWithImpl<$Res>
     Object? health = null,
     Object? energy = null,
     Object? drachmae = null,
+    Object? level = null,
+    Object? experience = null,
     Object? reputation = null,
     Object? skills = null,
     Object? currentLocation = null,
@@ -202,6 +220,14 @@ class __$$PlayerImplCopyWithImpl<$Res>
       drachmae: null == drachmae
           ? _value.drachmae
           : drachmae // ignore: cast_nullable_to_non_nullable
+              as int,
+      level: null == level
+          ? _value.level
+          : level // ignore: cast_nullable_to_non_nullable
+              as int,
+      experience: null == experience
+          ? _value.experience
+          : experience // ignore: cast_nullable_to_non_nullable
               as int,
       reputation: null == reputation
           ? _value._reputation
@@ -240,6 +266,8 @@ class _$PlayerImpl implements _Player {
       this.health = 100,
       this.energy = 100,
       this.drachmae = 100,
+      this.level = 1,
+      this.experience = 0,
       final Map<String, int> reputation = const {},
       final Map<String, int> skills = const {},
       this.currentLocation = 'athens',
@@ -270,6 +298,12 @@ class _$PlayerImpl implements _Player {
   @override
   @JsonKey()
   final int drachmae;
+  @override
+  @JsonKey()
+  final int level;
+  @override
+  @JsonKey()
+  final int experience;
   final Map<String, int> _reputation;
   @override
   @JsonKey()
@@ -320,7 +354,7 @@ class _$PlayerImpl implements _Player {
 
   @override
   String toString() {
-    return 'Player(name: $name, characterClass: $characterClass, health: $health, energy: $energy, drachmae: $drachmae, reputation: $reputation, skills: $skills, currentLocation: $currentLocation, completedQuests: $completedQuests, activeQuests: $activeQuests, storyFlags: $storyFlags)';
+    return 'Player(name: $name, characterClass: $characterClass, health: $health, energy: $energy, drachmae: $drachmae, level: $level, experience: $experience, reputation: $reputation, skills: $skills, currentLocation: $currentLocation, completedQuests: $completedQuests, activeQuests: $activeQuests, storyFlags: $storyFlags)';
   }
 
   @override
@@ -335,6 +369,9 @@ class _$PlayerImpl implements _Player {
             (identical(other.energy, energy) || other.energy == energy) &&
             (identical(other.drachmae, drachmae) ||
                 other.drachmae == drachmae) &&
+            (identical(other.level, level) || other.level == level) &&
+            (identical(other.experience, experience) ||
+                other.experience == experience) &&
             const DeepCollectionEquality()
                 .equals(other._reputation, _reputation) &&
             const DeepCollectionEquality().equals(other._skills, _skills) &&
@@ -357,6 +394,8 @@ class _$PlayerImpl implements _Player {
       health,
       energy,
       drachmae,
+      level,
+      experience,
       const DeepCollectionEquality().hash(_reputation),
       const DeepCollectionEquality().hash(_skills),
       currentLocation,
@@ -387,6 +426,8 @@ abstract class _Player implements Player {
       final int health,
       final int energy,
       final int drachmae,
+      final int level,
+      final int experience,
       final Map<String, int> reputation,
       final Map<String, int> skills,
       final String currentLocation,
@@ -406,6 +447,10 @@ abstract class _Player implements Player {
   int get energy;
   @override
   int get drachmae;
+  @override
+  int get level;
+  @override
+  int get experience;
   @override
   Map<String, int> get reputation;
   @override

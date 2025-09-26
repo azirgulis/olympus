@@ -41,6 +41,27 @@ class PlayerNotifier extends StateNotifier<Player> {
     }
   }
 
+  void addExperience(int amount) {
+    final newExperience = state.experience + amount;
+    final experienceForNextLevel = _getExperienceForLevel(state.level + 1);
+
+    if (newExperience >= experienceForNextLevel) {
+      // Level up!
+      final newLevel = state.level + 1;
+      state = state.copyWith(
+        experience: newExperience,
+        level: newLevel,
+      );
+    } else {
+      state = state.copyWith(experience: newExperience);
+    }
+  }
+
+  int _getExperienceForLevel(int level) {
+    // Experience formula: level^2 * 100
+    return level * level * 100;
+  }
+
   void updateLocation(String newLocation) {
     state = state.copyWith(currentLocation: newLocation);
   }
@@ -83,10 +104,6 @@ class PlayerNotifier extends StateNotifier<Player> {
     );
   }
 
-  void addExperience(int amount) {
-    // For now, just track experience - could add leveling system later
-    // This is called from quest rewards but doesn't need to do anything yet
-  }
 
   void addReputation(int amount) {
     // Add to overall reputation - for now, add to Athens

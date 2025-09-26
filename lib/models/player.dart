@@ -11,6 +11,8 @@ class Player with _$Player {
     @Default(100) int health,
     @Default(100) int energy,
     @Default(100) int drachmae,
+    @Default(1) int level,
+    @Default(0) int experience,
     @Default({}) Map<String, int> reputation,
     @Default({}) Map<String, int> skills,
     @Default('athens') String currentLocation,

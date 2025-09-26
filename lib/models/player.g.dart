@@ -14,6 +14,8 @@ _$PlayerImpl _$$PlayerImplFromJson(Map<String, dynamic> json) => _$PlayerImpl(
       health: (json['health'] as num?)?.toInt() ?? 100,
       energy: (json['energy'] as num?)?.toInt() ?? 100,
       drachmae: (json['drachmae'] as num?)?.toInt() ?? 100,
+      level: (json['level'] as num?)?.toInt() ?? 1,
+      experience: (json['experience'] as num?)?.toInt() ?? 0,
       reputation: (json['reputation'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, (e as num).toInt()),
           ) ??
@@ -44,6 +46,8 @@ Map<String, dynamic> _$$PlayerImplToJson(_$PlayerImpl instance) =>
       'health': instance.health,
       'energy': instance.energy,
       'drachmae': instance.drachmae,
+      'level': instance.level,
+      'experience': instance.experience,
       'reputation': instance.reputation,
       'skills': instance.skills,
       'currentLocation': instance.currentLocation,
