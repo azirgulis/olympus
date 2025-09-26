@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import '../main.dart';
 import '../screens/character_selection_screen.dart';
 import '../screens/game_map_screen.dart';
+import '../screens/locations/athens_screen.dart';
 
 final appRouter = GoRouter(
   routes: [
@@ -19,6 +20,11 @@ final appRouter = GoRouter(
       path: '/game',
       name: 'game',
       builder: (context, state) => const GameMapScreen(),
+    ),
+    GoRoute(
+      path: '/athens',
+      name: 'athens',
+      builder: (context, state) => const AthensScreen(),
     ),
   ],
 );

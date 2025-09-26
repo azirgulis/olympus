@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/player_provider.dart';
 import '../providers/inventory_provider.dart';
 
@@ -112,15 +113,10 @@ class GameMapScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 32),
 
-                      // Temporary Athens Button
+                      // Athens Button
                       ElevatedButton(
                         onPressed: () {
-                          // TODO: Navigate to Athens
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Athens hub coming next!'),
-                            ),
-                          );
+                          context.go('/athens');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
