@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'routing/app_router.dart';
 
 void main() {
   runApp(
@@ -14,7 +16,7 @@ class OdysseyOfOlympusApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Odyssey of Olympus: Economic Myths',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -22,7 +24,7 @@ class OdysseyOfOlympusApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MainMenuScreen(),
+      routerConfig: appRouter,
     );
   }
 }
@@ -77,7 +79,7 @@ class MainMenuScreen extends StatelessWidget {
               MenuButton(
                 text: 'New Quest',
                 onPressed: () {
-                  // TODO: Navigate to character selection
+                  context.go('/character-selection');
                 },
               ),
               const SizedBox(height: 16),

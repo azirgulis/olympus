@@ -10,28 +10,29 @@
 *Goal: Playable demo with Athens hub and basic mechanics*
 
 ### Project Setup & Architecture
-- [ ] Initialize Flutter project with proper folder structure
-  - [ ] Create `lib/` subfolders: models, providers, screens, widgets, services, utils
-  - [ ] Set up `assets/` folders: images, audio, data
-  - [ ] Configure `pubspec.yaml` with all required dependencies
+- [x] Initialize Flutter project with proper folder structure
+  - [x] Create `lib/` subfolders: models, providers, screens, widgets, services, utils
+  - [x] Set up `assets/` folders: images, audio, data
+  - [x] Configure `pubspec.yaml` with all required dependencies
 - [ ] Set up version control and development environment
-  - [ ] Initialize Git repository
-  - [ ] Create `.gitignore` for Flutter projects
+  - [x] Initialize Git repository
+  - [x] Create `.gitignore` for Flutter projects
+  - [ ] Set up GitHub repository and push code
   - [ ] Set up IDE configuration (VS Code/Android Studio)
-- [ ] Configure Riverpod state management
-  - [ ] Add ProviderScope to main app
-  - [ ] Create base provider structure
-  - [ ] Set up provider observer for debugging
+- [x] Configure Riverpod state management
+  - [x] Add ProviderScope to main app
+  - [x] Create base provider structure
+  - [x] Set up provider observer for debugging
 
 ### Core Data Models
-- [ ] Implement Player model (`lib/models/player.dart`)
-  - [ ] Player stats (health, energy, skills, reputation)
-  - [ ] Character class selection (Merchant/Scholar/Warrior)
-  - [ ] Serialization with Freezed and JSON
-- [ ] Create Inventory system (`lib/models/inventory.dart`)
-  - [ ] Item model with types, values, descriptions
-  - [ ] Inventory management with slot limitations
-  - [ ] Resource tracking (Food, Water, Drachmae, Tools)
+- [x] Implement Player model (`lib/models/player.dart`)
+  - [x] Player stats (health, energy, skills, reputation)
+  - [x] Character class selection (Merchant/Scholar/Warrior)
+  - [x] Serialization with Freezed and JSON
+- [x] Create Inventory system (`lib/models/inventory.dart`)
+  - [x] Item model with types, values, descriptions
+  - [x] Inventory management with slot limitations
+  - [x] Resource tracking (Food, Water, Drachmae, Tools)
 - [ ] Build Location model (`lib/models/location.dart`)
   - [ ] Location properties and available actions
   - [ ] Market data and pricing information
@@ -46,14 +47,14 @@
   - [ ] Current location and game progress
   - [ ] Story flags and unlocked content
   - [ ] Game difficulty and settings
-- [ ] PlayerProvider (`lib/providers/player_provider.dart`)
-  - [ ] Player stats and character management
-  - [ ] Skill progression and leveling
-  - [ ] Reputation tracking with gods/cities
-- [ ] InventoryProvider (`lib/providers/inventory_provider.dart`)
-  - [ ] Real-time inventory updates
-  - [ ] Item usage and trading logic
-  - [ ] Resource consumption tracking
+- [x] PlayerProvider (`lib/providers/player_provider.dart`)
+  - [x] Player stats and character management
+  - [x] Skill progression and leveling
+  - [x] Reputation tracking with gods/cities
+- [x] InventoryProvider (`lib/providers/inventory_provider.dart`)
+  - [x] Real-time inventory updates
+  - [x] Item usage and trading logic
+  - [x] Resource consumption tracking
 - [ ] MarketProvider (`lib/providers/market_provider.dart`)
   - [ ] Dynamic pricing algorithms
   - [ ] Supply and demand simulation
@@ -75,8 +76,8 @@
   - [ ] Deep linking support
 
 ### Basic Screens Implementation
-- [ ] Main Menu Screen (`lib/screens/main_menu_screen.dart`)
-  - [ ] New game, continue, settings options
+- [x] Main Menu Screen (`lib/screens/main_menu_screen.dart`)
+  - [x] New game, continue, settings options
   - [ ] Character class selection
   - [ ] Difficulty mode selection
 - [ ] Game Map Screen (`lib/screens/game_map_screen.dart`)
