@@ -5,6 +5,7 @@ import '../models/harbor.dart';
 import '../providers/harbor_provider.dart';
 import '../providers/player_provider.dart';
 import '../widgets/game_ui/resource_bar.dart';
+import 'dialogs/expedition_planning_dialog.dart';
 
 class HarborScreen extends ConsumerStatefulWidget {
   const HarborScreen({super.key});
@@ -34,7 +35,6 @@ class _HarborScreenState extends ConsumerState<HarborScreen>
     final player = ref.watch(playerProvider);
     final harborState = ref.watch(harborProvider);
     final unlockedRoutes = ref.watch(unlockedRoutesProvider);
-    final availableShips = ref.watch(availableShipsProvider);
     final activeExpeditions = ref.watch(activeExpeditionsProvider);
 
     return Scaffold(
@@ -767,7 +767,7 @@ class _HarborScreenState extends ConsumerState<HarborScreen>
       case ShipType.war_galley:
         return Icons.military_tech;
       case ShipType.luxury_yacht:
-        return Icons.yacht;
+        return Icons.sailing;
     }
   }
 
@@ -789,18 +789,125 @@ class _HarborScreenState extends ConsumerState<HarborScreen>
   }
 
   void _startExpedition(TradeRoute route) {
-    // TODO: Implement expedition planning dialog
+    final availableShips = ref.read(availableShipsProvider);
+
+    if (availableShips.isEmpty) {
+      _showMessage('No available ships! All ships are on expeditions.', Colors.red);
+      return;
+    }
+
+    // If only one ship available, go directly to expedition planning
+    if (availableShips.length == 1) {
+      _showExpeditionPlanningDialog(route, availableShips.first);
+      return;
+    }
+
+    // Show ship selection dialog first
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Start Expedition to ${route.destination}'),
-        content: const Text('Expedition planning coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+      builder: (context) => Dialog(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.6,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.blue.shade50,
+                Colors.blue.shade100,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.directions_boat, color: Colors.blue.shade700, size: 32),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Select Ship for ${route.destination}',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Colors.blue.shade800,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close, color: Colors.blue.shade700),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: availableShips.length,
+                  itemBuilder: (context, index) {
+                    final ship = availableShips[index];
+                    final travelTime = (route.baseTravelTime * (100 / ship.speed)).round();
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade700,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.sailing,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        title: Text(
+                          ship.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Capacity: ${ship.cargoCapacity} units'),
+                            Text('Travel Time: ${travelTime}h'),
+                            Text('Type: ${ship.type.name.replaceAll('_', ' ').toUpperCase()}'),
+                          ],
+                        ),
+                        trailing: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _showExpeditionPlanningDialog(route, ship);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade700,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Select'),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showExpeditionPlanningDialog(TradeRoute route, Ship ship) {
+    showDialog(
+      context: context,
+      builder: (context) => ExpeditionPlanningDialog(
+        route: route,
+        ship: ship,
       ),
     );
   }

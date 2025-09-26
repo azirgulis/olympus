@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../models/harbor.dart';
@@ -11,8 +12,23 @@ part 'harbor_provider.freezed.dart';
 part 'harbor_provider.g.dart';
 
 class HarborNotifier extends StateNotifier<HarborState> {
+  Timer? _progressTimer;
+
   HarborNotifier() : super(const HarborState()) {
     _initializeHarbor();
+    _startProgressTimer();
+  }
+
+  @override
+  void dispose() {
+    _progressTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startProgressTimer() {
+    _progressTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      updateExpeditionProgress();
+    });
   }
 
   void _initializeHarbor() {
@@ -53,7 +69,7 @@ class HarborNotifier extends StateNotifier<HarborState> {
     int totalCost = 0;
     for (final item in cargo) {
       totalCost += item.purchasePrice * item.quantity;
-      ref.read(inventoryProvider.notifier).removeItem(item.goodId, item.quantity);
+      ref.read(inventoryProvider.notifier).removeItem(item.goodId, quantity: item.quantity);
     }
     ref.read(playerProvider.notifier).spendDrachmae(totalCost);
 
