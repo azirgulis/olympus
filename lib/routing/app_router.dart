@@ -6,6 +6,7 @@ import '../screens/locations/athens_screen.dart';
 import '../screens/save_load_screen.dart';
 import '../screens/quest_screen.dart';
 import '../screens/academy_screen.dart';
+import '../screens/harbor_screen.dart';
 
 final appRouter = GoRouter(
   routes: [
@@ -46,6 +47,11 @@ final appRouter = GoRouter(
       path: '/academy',
       name: 'academy',
       builder: (context, state) => const AcademyScreen(),
+    ),
+    GoRoute(
+      path: '/harbor',
+      name: 'harbor',
+      builder: (context, state) => const HarborScreen(),
     ),
   ],
 );

@@ -7,10 +7,12 @@ import '../../providers/game_state_provider.dart';
 import '../../providers/simple_save_provider.dart';
 import '../../providers/quest_provider.dart';
 import '../../providers/academy_provider.dart';
+import '../../providers/harbor_provider.dart';
 import '../../widgets/game_ui/resource_bar.dart';
 import '../market_screen.dart';
 import '../quest_screen.dart';
 import '../academy_screen.dart';
+import '../harbor_screen.dart';
 
 class AthensScreen extends ConsumerStatefulWidget {
   const AthensScreen({super.key});
@@ -41,6 +43,8 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
     final activeQuests = ref.watch(activeQuestsProvider);
     final unlockedLessons = ref.watch(unlockedLessonsProvider);
     final completedLessons = ref.watch(completedLessonsProvider);
+    final unlockedRoutes = ref.watch(unlockedRoutesProvider);
+    final activeExpeditions = ref.watch(activeExpeditionsProvider);
     final isFirstVisit = !(gameState.completedTutorials['athens_intro'] ?? false);
 
     return Scaffold(
@@ -204,11 +208,9 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
                             unlockedLessons.length,
                             completedLessons.length,
                           ),
-                          _buildActionCard(
-                            'Harbor',
-                            'Trade with distant lands\nInternational commerce',
-                            Icons.sailing,
-                            () => _showComingSoon('Harbor'),
+                          _buildHarborActionCard(
+                            unlockedRoutes.length,
+                            activeExpeditions.length,
                           ),
                           _buildQuestActionCard(
                             availableQuests.length,
@@ -532,6 +534,100 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
     );
   }
 
+  Widget _buildHarborActionCard(int routesCount, int expeditionsCount) {
+    return GestureDetector(
+      onTap: () => _navigateToHarbor(),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF8B4513), width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.sailing,
+                  size: 40,
+                  color: const Color(0xFF8B4513),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Harbor',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF8B4513),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Trade with distant lands\nInternational commerce',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: const Color(0xFF8B4513).withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
+            ),
+            // Notification badges
+            if (routesCount > 0)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF2E86AB),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '$routesCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            if (expeditionsCount > 0)
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '$expeditionsCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildNPCSection() {
     return Container(
       width: double.infinity,
@@ -613,6 +709,14 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const AcademyScreen(),
+      ),
+    );
+  }
+
+  void _navigateToHarbor() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const HarborScreen(),
       ),
     );
   }
