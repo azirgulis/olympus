@@ -190,14 +190,13 @@ class GameMapScreen extends ConsumerWidget {
                                 Icon(
                                   _getItemIcon(item.type),
                                   color: Colors.white,
-                                  size: 16,
+                                  size: 14,
                                 ),
-                                const SizedBox(height: 2),
                                 Text(
                                   '${item.quantity}',
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 10,
+                                    fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

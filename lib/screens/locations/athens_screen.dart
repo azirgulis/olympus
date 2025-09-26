@@ -67,7 +67,13 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: () => context.pop(),
+                          onPressed: () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go('/game');
+                            }
+                          },
                           icon: const Icon(Icons.arrow_back, color: Colors.white),
                         ),
                         Expanded(
