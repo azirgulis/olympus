@@ -3,6 +3,7 @@ import '../main.dart';
 import '../screens/character_selection_screen.dart';
 import '../screens/game_map_screen.dart';
 import '../screens/locations/athens_screen.dart';
+import '../screens/save_load_screen.dart';
 
 final appRouter = GoRouter(
   routes: [
@@ -25,6 +26,14 @@ final appRouter = GoRouter(
       path: '/athens',
       name: 'athens',
       builder: (context, state) => const AthensScreen(),
+    ),
+    GoRoute(
+      path: '/save-load',
+      name: 'save-load',
+      builder: (context, state) {
+        final mode = state.uri.queryParameters['mode'];
+        return SaveLoadScreen(isLoadMode: mode == 'load');
+      },
     ),
   ],
 );

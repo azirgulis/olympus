@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'routing/app_router.dart';
+import 'services/storage_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize storage service
+  await StorageService.initialize();
+
   runApp(
     const ProviderScope(
       child: OdysseyOfOlympusApp(),
@@ -86,7 +92,7 @@ class MainMenuScreen extends StatelessWidget {
               MenuButton(
                 text: 'Continue Journey',
                 onPressed: () {
-                  // TODO: Load saved game
+                  context.go('/save-load?mode=load');
                 },
               ),
               const SizedBox(height: 16),

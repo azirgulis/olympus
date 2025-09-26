@@ -125,6 +125,22 @@ class GameMapScreen extends ConsumerWidget {
                         ),
                         child: const Text('Enter Athens'),
                       ),
+
+                      const SizedBox(height: 16),
+
+                      // Save Game Button
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          context.go('/save-load?mode=save');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        ),
+                        icon: const Icon(Icons.save),
+                        label: const Text('Save Game'),
+                      ),
                     ],
                   ),
                 ),

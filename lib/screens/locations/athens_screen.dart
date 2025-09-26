@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/player_provider.dart';
 import '../../providers/market_provider.dart';
 import '../../providers/game_state_provider.dart';
+import '../../providers/simple_save_provider.dart';
 import '../../widgets/game_ui/resource_bar.dart';
 import '../market_screen.dart';
 
@@ -22,6 +23,9 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(gameStateProvider.notifier).initializeGame();
       ref.read(marketProvider.notifier).initializeMarkets();
+
+      // Auto-save when entering Athens
+      SaveGameService.autoSave(ref);
     });
   }
 
