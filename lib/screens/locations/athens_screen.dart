@@ -8,11 +8,13 @@ import '../../providers/simple_save_provider.dart';
 import '../../providers/quest_provider.dart';
 import '../../providers/academy_provider.dart';
 import '../../providers/harbor_provider.dart';
+import '../../providers/npc_provider.dart';
 import '../../widgets/game_ui/resource_bar.dart';
 import '../market_screen.dart';
 import '../quest_screen.dart';
 import '../academy_screen.dart';
 import '../harbor_screen.dart';
+import '../dialogs/npc_dialogue_dialog.dart';
 
 class AthensScreen extends ConsumerStatefulWidget {
   const AthensScreen({super.key});
@@ -629,6 +631,8 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
   }
 
   Widget _buildNPCSection() {
+    final npcsInAthens = ref.watch(npcsInLocationProvider('athens'));
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -650,42 +654,119 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNPCIcon('Socrates\nPhilosopher', Icons.psychology),
-              _buildNPCIcon('Alexios\nMerchant', Icons.store),
-              _buildNPCIcon('Helen\nTrader', Icons.local_shipping),
-            ],
+            children: npcsInAthens.map((npc) => _buildNPCIcon(npc)).toList(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNPCIcon(String name, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF8B4513),
-            shape: BoxShape.circle,
+  Widget _buildNPCIcon(dynamic npcInput) {
+    // Handle both old string format and new NPC object
+    if (npcInput is String) {
+      // Legacy support
+      return Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF8B4513),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.person,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
+          const SizedBox(height: 8),
+          Text(
+            npcInput,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF8B4513),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          name,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF8B4513),
+        ],
+      );
+    }
+
+    // New NPC object handling
+    final npc = npcInput;
+    final availableDialogues = ref.read(npcProvider.notifier).getAvailableDialoguesForNPC(npc.id);
+    final hasNewDialogues = availableDialogues.isNotEmpty;
+
+    return GestureDetector(
+      onTap: () => _showNPCDialog(npc),
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _getNPCTypeColor(npc.type),
+                  shape: BoxShape.circle,
+                  border: hasNewDialogues
+                    ? Border.all(color: Colors.amber, width: 3)
+                    : null,
+                ),
+                child: Icon(
+                  _getNPCTypeIcon(npc.type),
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              if (hasNewDialogues)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                  ),
+                ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Text(
+            '${npc.name}\n${npc.title}',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: hasNewDialogues ? Colors.amber.shade800 : const Color(0xFF8B4513),
+              fontWeight: hasNewDialogues ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getNPCTypeColor(dynamic type) {
+    if (type.toString() == 'NPCType.philosopher') return Colors.purple.shade600;
+    if (type.toString() == 'NPCType.merchant') return Colors.green.shade600;
+    if (type.toString() == 'NPCType.trader') return Colors.blue.shade600;
+    return const Color(0xFF8B4513);
+  }
+
+  IconData _getNPCTypeIcon(dynamic type) {
+    if (type.toString() == 'NPCType.philosopher') return Icons.psychology;
+    if (type.toString() == 'NPCType.merchant') return Icons.store;
+    if (type.toString() == 'NPCType.trader') return Icons.local_shipping;
+    return Icons.person;
+  }
+
+  void _showNPCDialog(dynamic npc) {
+    showDialog(
+      context: context,
+      builder: (context) => NPCDialogueDialog(npc: npc),
     );
   }
 

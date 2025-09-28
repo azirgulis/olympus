@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:go_router/go_router.dart';
 import '../models/game_map.dart';
 import '../data/map/locations.dart';
 import '../data/map/travel_routes.dart';
 import '../data/map/encounters.dart';
+import '../models/inventory.dart';
 import 'player_provider.dart';
 import 'inventory_provider.dart';
 
@@ -29,7 +31,7 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
     state = state.copyWith(
       locations: locations,
       currentLocationId: 'athens', // Start in Athens
-      unlockedLocationIds: ['athens', 'piraeus'], // Athens and Piraeus unlocked
+      unlockedLocationIds: ['athens', 'marathon', 'thebes', 'corinth', 'delphi', 'sparta'], // Multiple destinations unlocked
     );
   }
 
@@ -89,7 +91,7 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
 
   void _startJourneyTimer() {
     _journeyTimer?.cancel();
-    _journeyTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _journeyTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       _updateJourneyProgress();
     });
   }
@@ -183,23 +185,96 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
       case OutcomeType.gainExperience:
         ref.read(playerProvider.notifier).addExperience(outcome.value);
         break;
+      case OutcomeType.gainHealth:
+        final player = ref.read(playerProvider);
+        final newHealth = (player.health + outcome.value).clamp(0, 100);
+        ref.read(playerProvider.notifier).updateHealth(newHealth);
+        break;
+      case OutcomeType.loseHealth:
+        final player = ref.read(playerProvider);
+        final newHealth = (player.health - outcome.value).clamp(0, 100);
+        ref.read(playerProvider.notifier).updateHealth(newHealth);
+        break;
       case OutcomeType.gainItem:
-        // TODO: Add item to inventory
+        if (outcome.itemId.isNotEmpty) {
+          _addEncounterItem(outcome.itemId, outcome.value, ref);
+        }
         break;
       case OutcomeType.loseItem:
-        // TODO: Remove item from inventory
+        if (outcome.itemId.isNotEmpty) {
+          ref.read(inventoryProvider.notifier).removeItem(outcome.itemId, quantity: outcome.value);
+        }
         break;
       case OutcomeType.gainReputation:
-        // TODO: Add reputation system
+        if (outcome.itemId.isNotEmpty) {
+          ref.read(playerProvider.notifier).updateReputation(outcome.itemId, outcome.value);
+        }
         break;
       case OutcomeType.loseReputation:
-        // TODO: Add reputation system
+        if (outcome.itemId.isNotEmpty) {
+          ref.read(playerProvider.notifier).updateReputation(outcome.itemId, -outcome.value);
+        }
+        break;
+      case OutcomeType.gainKnowledge:
+        // Knowledge points could be added to player stats in the future
         break;
       case OutcomeType.unlockLocation:
         unlockLocation(outcome.itemId);
         break;
-      default:
+      case OutcomeType.questTrigger:
+        // Quest triggers are handled in the UI
         break;
+    }
+  }
+
+  void _addEncounterItem(String itemId, int quantity, WidgetRef ref) {
+    // Create items that can be gained from encounters
+    final encounterItems = {
+      'drachma_pouch': InventoryItem(
+        id: 'drachma_pouch',
+        name: 'Drachma Pouch',
+        description: 'A small pouch containing coins',
+        type: ItemType.treasure,
+        value: 25,
+        quantity: quantity,
+      ),
+      'healing_herb': InventoryItem(
+        id: 'healing_herb',
+        name: 'Healing Herb',
+        description: 'Restores health when consumed',
+        type: ItemType.consumable,
+        value: 10,
+        quantity: quantity,
+      ),
+      'trade_goods': InventoryItem(
+        id: 'trade_goods',
+        name: 'Trade Goods',
+        description: 'Valuable goods for trading',
+        type: ItemType.trade,
+        value: 20,
+        quantity: quantity,
+      ),
+      'ancient_scroll': InventoryItem(
+        id: 'ancient_scroll',
+        name: 'Ancient Scroll',
+        description: 'Contains ancient knowledge',
+        type: ItemType.knowledge,
+        value: 50,
+        quantity: quantity,
+      ),
+      'travel_supplies': InventoryItem(
+        id: 'travel_supplies',
+        name: 'Travel Supplies',
+        description: 'Essential supplies for long journeys',
+        type: ItemType.resource,
+        value: 15,
+        quantity: quantity,
+      ),
+    };
+
+    final item = encounterItems[itemId];
+    if (item != null) {
+      ref.read(inventoryProvider.notifier).addItem(item);
     }
   }
 
@@ -237,9 +312,22 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
       unlockedLocationIds: newUnlocked.toList(),
       currentJourney: null,
       isJourneyInProgress: false,
+      shouldNavigateToLocation: destinationId, // Add navigation flag
     );
 
     _journeyTimer?.cancel();
+
+    // Navigate immediately to the destination location
+    _navigateToLocation(destinationId);
+  }
+
+  void _navigateToLocation(String locationId) {
+    // This will be called by the UI to navigate
+    print('Journey complete! Should navigate to: $locationId');
+  }
+
+  void clearNavigationFlag() {
+    state = state.copyWith(shouldNavigateToLocation: null);
   }
 
   void syncWithPlayerLocation(String playerLocationId) {
@@ -288,9 +376,10 @@ class GameMapState with _$GameMapState {
   const factory GameMapState({
     @Default([]) List<GameLocation> locations,
     @Default('athens') String currentLocationId,
-    @Default(['athens', 'piraeus']) List<String> unlockedLocationIds,
+    @Default(['athens', 'marathon', 'thebes', 'corinth', 'delphi', 'sparta']) List<String> unlockedLocationIds,
     @Default(false) bool isJourneyInProgress,
     PlayerJourney? currentJourney,
+    String? shouldNavigateToLocation,
   }) = _GameMapState;
 
   factory GameMapState.fromJson(Map<String, dynamic> json) => _$GameMapStateFromJson(json);

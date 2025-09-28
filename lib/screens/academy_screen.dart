@@ -86,11 +86,14 @@ class _AcademyScreenState extends ConsumerState<AcademyScreen>
                               children: [
                                 const Icon(Icons.school, color: Colors.white, size: 28),
                                 const SizedBox(width: 8),
-                                Text(
-                                  'ACADEMY OF ATHENS',
-                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                Flexible(
+                                  child: Text(
+                                    'ACADEMY OF ATHENS',
+                                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -227,8 +230,8 @@ class _AcademyScreenState extends ConsumerState<AcademyScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.rocket_launch),
-                          Text('Beginner', style: TextStyle(fontSize: 11)),
+                          Icon(Icons.rocket_launch, size: 16),
+                          Text('Beginner', style: TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),
@@ -236,8 +239,8 @@ class _AcademyScreenState extends ConsumerState<AcademyScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.trending_up),
-                          Text('Intermediate', style: TextStyle(fontSize: 11)),
+                          Icon(Icons.trending_up, size: 16),
+                          Text('Intermediate', style: TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),
@@ -245,8 +248,8 @@ class _AcademyScreenState extends ConsumerState<AcademyScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star),
-                          Text('Advanced', style: TextStyle(fontSize: 11)),
+                          Icon(Icons.star, size: 16),
+                          Text('Advanced', style: TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),
@@ -254,8 +257,8 @@ class _AcademyScreenState extends ConsumerState<AcademyScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.all_inclusive),
-                          Text('All', style: TextStyle(fontSize: 11)),
+                          Icon(Icons.all_inclusive, size: 16),
+                          Text('All', style: TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),

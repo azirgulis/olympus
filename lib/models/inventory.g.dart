@@ -50,6 +50,10 @@ const _$ItemTypeEnumMap = {
   ItemType.tradeGood: 'trade_good',
   ItemType.questItem: 'quest_item',
   ItemType.resource: 'resource',
+  ItemType.treasure: 'treasure',
+  ItemType.consumable: 'consumable',
+  ItemType.trade: 'trade',
+  ItemType.knowledge: 'knowledge',
 };
 
 const _$ItemRarityEnumMap = {

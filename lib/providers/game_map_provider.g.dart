@@ -16,12 +16,13 @@ _$GameMapStateImpl _$$GameMapStateImplFromJson(Map<String, dynamic> json) =>
       unlockedLocationIds: (json['unlockedLocationIds'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
-          const ['athens', 'piraeus'],
+          const ['athens', 'marathon', 'thebes', 'corinth', 'delphi', 'sparta'],
       isJourneyInProgress: json['isJourneyInProgress'] as bool? ?? false,
       currentJourney: json['currentJourney'] == null
           ? null
           : PlayerJourney.fromJson(
               json['currentJourney'] as Map<String, dynamic>),
+      shouldNavigateToLocation: json['shouldNavigateToLocation'] as String?,
     );
 
 Map<String, dynamic> _$$GameMapStateImplToJson(_$GameMapStateImpl instance) =>
@@ -31,4 +32,5 @@ Map<String, dynamic> _$$GameMapStateImplToJson(_$GameMapStateImpl instance) =>
       'unlockedLocationIds': instance.unlockedLocationIds,
       'isJourneyInProgress': instance.isJourneyInProgress,
       'currentJourney': instance.currentJourney,
+      'shouldNavigateToLocation': instance.shouldNavigateToLocation,
     };

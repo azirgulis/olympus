@@ -25,6 +25,7 @@ mixin _$GameMapState {
   List<String> get unlockedLocationIds => throw _privateConstructorUsedError;
   bool get isJourneyInProgress => throw _privateConstructorUsedError;
   PlayerJourney? get currentJourney => throw _privateConstructorUsedError;
+  String? get shouldNavigateToLocation => throw _privateConstructorUsedError;
 
   /// Serializes this GameMapState to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -47,7 +48,8 @@ abstract class $GameMapStateCopyWith<$Res> {
       String currentLocationId,
       List<String> unlockedLocationIds,
       bool isJourneyInProgress,
-      PlayerJourney? currentJourney});
+      PlayerJourney? currentJourney,
+      String? shouldNavigateToLocation});
 
   $PlayerJourneyCopyWith<$Res>? get currentJourney;
 }
@@ -72,6 +74,7 @@ class _$GameMapStateCopyWithImpl<$Res, $Val extends GameMapState>
     Object? unlockedLocationIds = null,
     Object? isJourneyInProgress = null,
     Object? currentJourney = freezed,
+    Object? shouldNavigateToLocation = freezed,
   }) {
     return _then(_value.copyWith(
       locations: null == locations
@@ -94,6 +97,10 @@ class _$GameMapStateCopyWithImpl<$Res, $Val extends GameMapState>
           ? _value.currentJourney
           : currentJourney // ignore: cast_nullable_to_non_nullable
               as PlayerJourney?,
+      shouldNavigateToLocation: freezed == shouldNavigateToLocation
+          ? _value.shouldNavigateToLocation
+          : shouldNavigateToLocation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -125,7 +132,8 @@ abstract class _$$GameMapStateImplCopyWith<$Res>
       String currentLocationId,
       List<String> unlockedLocationIds,
       bool isJourneyInProgress,
-      PlayerJourney? currentJourney});
+      PlayerJourney? currentJourney,
+      String? shouldNavigateToLocation});
 
   @override
   $PlayerJourneyCopyWith<$Res>? get currentJourney;
@@ -149,6 +157,7 @@ class __$$GameMapStateImplCopyWithImpl<$Res>
     Object? unlockedLocationIds = null,
     Object? isJourneyInProgress = null,
     Object? currentJourney = freezed,
+    Object? shouldNavigateToLocation = freezed,
   }) {
     return _then(_$GameMapStateImpl(
       locations: null == locations
@@ -171,6 +180,10 @@ class __$$GameMapStateImplCopyWithImpl<$Res>
           ? _value.currentJourney
           : currentJourney // ignore: cast_nullable_to_non_nullable
               as PlayerJourney?,
+      shouldNavigateToLocation: freezed == shouldNavigateToLocation
+          ? _value.shouldNavigateToLocation
+          : shouldNavigateToLocation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -181,9 +194,17 @@ class _$GameMapStateImpl implements _GameMapState {
   const _$GameMapStateImpl(
       {final List<GameLocation> locations = const [],
       this.currentLocationId = 'athens',
-      final List<String> unlockedLocationIds = const ['athens', 'piraeus'],
+      final List<String> unlockedLocationIds = const [
+        'athens',
+        'marathon',
+        'thebes',
+        'corinth',
+        'delphi',
+        'sparta'
+      ],
       this.isJourneyInProgress = false,
-      this.currentJourney})
+      this.currentJourney,
+      this.shouldNavigateToLocation})
       : _locations = locations,
         _unlockedLocationIds = unlockedLocationIds;
 
@@ -217,10 +238,12 @@ class _$GameMapStateImpl implements _GameMapState {
   final bool isJourneyInProgress;
   @override
   final PlayerJourney? currentJourney;
+  @override
+  final String? shouldNavigateToLocation;
 
   @override
   String toString() {
-    return 'GameMapState(locations: $locations, currentLocationId: $currentLocationId, unlockedLocationIds: $unlockedLocationIds, isJourneyInProgress: $isJourneyInProgress, currentJourney: $currentJourney)';
+    return 'GameMapState(locations: $locations, currentLocationId: $currentLocationId, unlockedLocationIds: $unlockedLocationIds, isJourneyInProgress: $isJourneyInProgress, currentJourney: $currentJourney, shouldNavigateToLocation: $shouldNavigateToLocation)';
   }
 
   @override
@@ -237,7 +260,10 @@ class _$GameMapStateImpl implements _GameMapState {
             (identical(other.isJourneyInProgress, isJourneyInProgress) ||
                 other.isJourneyInProgress == isJourneyInProgress) &&
             (identical(other.currentJourney, currentJourney) ||
-                other.currentJourney == currentJourney));
+                other.currentJourney == currentJourney) &&
+            (identical(
+                    other.shouldNavigateToLocation, shouldNavigateToLocation) ||
+                other.shouldNavigateToLocation == shouldNavigateToLocation));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -248,7 +274,8 @@ class _$GameMapStateImpl implements _GameMapState {
       currentLocationId,
       const DeepCollectionEquality().hash(_unlockedLocationIds),
       isJourneyInProgress,
-      currentJourney);
+      currentJourney,
+      shouldNavigateToLocation);
 
   /// Create a copy of GameMapState
   /// with the given fields replaced by the non-null parameter values.
@@ -272,7 +299,8 @@ abstract class _GameMapState implements GameMapState {
       final String currentLocationId,
       final List<String> unlockedLocationIds,
       final bool isJourneyInProgress,
-      final PlayerJourney? currentJourney}) = _$GameMapStateImpl;
+      final PlayerJourney? currentJourney,
+      final String? shouldNavigateToLocation}) = _$GameMapStateImpl;
 
   factory _GameMapState.fromJson(Map<String, dynamic> json) =
       _$GameMapStateImpl.fromJson;
@@ -287,6 +315,8 @@ abstract class _GameMapState implements GameMapState {
   bool get isJourneyInProgress;
   @override
   PlayerJourney? get currentJourney;
+  @override
+  String? get shouldNavigateToLocation;
 
   /// Create a copy of GameMapState
   /// with the given fields replaced by the non-null parameter values.

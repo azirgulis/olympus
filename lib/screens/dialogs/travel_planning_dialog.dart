@@ -26,7 +26,6 @@ class TravelPlanningDialog extends ConsumerWidget {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.7,
-        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -38,7 +37,10 @@ class TravelPlanningDialog extends ConsumerWidget {
           ),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Column(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -314,7 +316,7 @@ class TravelPlanningDialog extends ConsumerWidget {
               ),
             ),
 
-            const Spacer(),
+            const SizedBox(height: 20),
 
             // Action buttons
             Row(
@@ -339,6 +341,7 @@ class TravelPlanningDialog extends ConsumerWidget {
               ],
             ),
           ],
+          ),
         ),
       ),
     );

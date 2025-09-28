@@ -146,8 +146,8 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.play_arrow),
-                          Text('Active (${activeQuests.length})'),
+                          const Icon(Icons.play_arrow, size: 16),
+                          Text('Active (${activeQuests.length})', style: const TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),
@@ -155,8 +155,8 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.assignment),
-                          Text('Available (${availableQuests.length})'),
+                          const Icon(Icons.assignment, size: 16),
+                          Text('Available (${availableQuests.length})', style: const TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),
@@ -164,8 +164,8 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.check_circle),
-                          Text('Completed (${completedQuests.length})'),
+                          const Icon(Icons.check_circle, size: 16),
+                          Text('Completed (${completedQuests.length})', style: const TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),
@@ -173,8 +173,8 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.all_inclusive),
-                          Text('All (${allQuests.length})'),
+                          const Icon(Icons.all_inclusive, size: 16),
+                          Text('All (${allQuests.length})', style: const TextStyle(fontSize: 10)),
                         ],
                       ),
                     ),
@@ -358,7 +358,7 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
                   ),
                 ),
                 const SizedBox(height: 8),
-                ...quest.objectives.map((objective) => _buildObjectiveItem(objective)),
+                ...quest.objectives.map((objective) => _buildObjectiveItem(quest, objective)),
 
                 const SizedBox(height: 12),
 
@@ -414,36 +414,64 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
     );
   }
 
-  Widget _buildObjectiveItem(QuestObjective objective) {
+  Widget _buildObjectiveItem(Quest quest, QuestObjective objective) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        children: [
-          Icon(
-            objective.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: objective.isCompleted
+              ? Colors.green.withValues(alpha: 0.1)
+              : Colors.grey.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
             color: objective.isCompleted ? Colors.green : Colors.grey,
-            size: 16,
+            width: 1,
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              objective.description,
-              style: TextStyle(
-                fontSize: 12,
-                color: objective.isCompleted ? Colors.green : Colors.black87,
-                decoration: objective.isCompleted ? TextDecoration.lineThrough : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              objective.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: objective.isCompleted ? Colors.green : Colors.grey,
+              size: 16,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    objective.description,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: objective.isCompleted ? Colors.green : Colors.black87,
+                      decoration: objective.isCompleted ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  if (objective.targetProgress != null && objective.currentProgress != null)
+                    Text(
+                      'Progress: ${objective.currentProgress}/${objective.targetProgress}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey,
+                      ),
+                    ),
+                ],
               ),
             ),
-          ),
-          if (objective.targetProgress != null && objective.currentProgress != null)
-            Text(
-              '${objective.currentProgress}/${objective.targetProgress}',
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.grey,
+            if (quest.status == QuestStatus.started && !objective.isCompleted)
+              ElevatedButton(
+                onPressed: () => _completeObjective(quest, objective),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(60, 30),
+                ),
+                child: const Text('Do', style: TextStyle(fontSize: 10)),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -584,6 +612,21 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
   void _completeQuest(Quest quest) {
     ref.read(questProvider.notifier).completeQuest(quest.id, ref);
     _showMessage('Quest completed: ${quest.title}', Colors.green);
+  }
+
+  void _completeObjective(Quest quest, QuestObjective objective) {
+    if (objective.targetProgress != null) {
+      // For objectives with progress tracking, set to target
+      ref.read(questProvider.notifier).updateObjectiveProgress(
+        quest.id,
+        objective.id,
+        objective.targetProgress!
+      );
+    } else {
+      // For simple objectives, mark as complete
+      ref.read(questProvider.notifier).completeObjective(quest.id, objective.id);
+    }
+    _showMessage('Objective completed: ${objective.description}', Colors.green);
   }
 
   void _showMessage(String message, Color color) {

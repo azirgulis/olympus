@@ -507,6 +507,14 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
         return Icons.local_shipping;
       case ItemType.questItem:
         return Icons.star;
+      case ItemType.treasure:
+        return Icons.diamond;
+      case ItemType.consumable:
+        return Icons.local_drink;
+      case ItemType.trade:
+        return Icons.business;
+      case ItemType.knowledge:
+        return Icons.school;
     }
   }
 

@@ -39,6 +39,14 @@ enum ItemType {
   questItem,
   @JsonValue('resource')
   resource,
+  @JsonValue('treasure')
+  treasure,
+  @JsonValue('consumable')
+  consumable,
+  @JsonValue('trade')
+  trade,
+  @JsonValue('knowledge')
+  knowledge,
 }
 
 enum ItemRarity {

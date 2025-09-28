@@ -292,6 +292,14 @@ class ItemTypeAdapter extends TypeAdapter<ItemType> {
         return ItemType.questItem;
       case 4:
         return ItemType.resource;
+      case 5:
+        return ItemType.treasure;
+      case 6:
+        return ItemType.consumable;
+      case 7:
+        return ItemType.trade;
+      case 8:
+        return ItemType.knowledge;
       default:
         return ItemType.resource;
     }
@@ -314,6 +322,18 @@ class ItemTypeAdapter extends TypeAdapter<ItemType> {
         break;
       case ItemType.resource:
         writer.writeByte(4);
+        break;
+      case ItemType.treasure:
+        writer.writeByte(5);
+        break;
+      case ItemType.consumable:
+        writer.writeByte(6);
+        break;
+      case ItemType.trade:
+        writer.writeByte(7);
+        break;
+      case ItemType.knowledge:
+        writer.writeByte(8);
         break;
     }
   }

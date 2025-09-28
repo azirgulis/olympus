@@ -4,16 +4,6 @@ class TravelRoutesData {
   static List<TravelRoute> getAllRoutes() {
     return [
       // Athens connections
-      const TravelRoute(
-        fromLocationId: 'athens',
-        toLocationId: 'piraeus',
-        distance: 12,
-        baseTravelTime: 30, // 30 minutes
-        cost: 5,
-        difficulty: RouteDifficulty.easy,
-        possibleEncounters: ['merchant', 'traveler'],
-        description: 'Short journey to the bustling port of Athens',
-      ),
 
       const TravelRoute(
         fromLocationId: 'athens',
@@ -48,13 +38,13 @@ class TravelRoutesData {
         description: 'Northern route through Boeotian plains',
       ),
 
-      // Naval routes (require ship)
+      // Naval routes from Athens (require ship)
       const TravelRoute(
-        fromLocationId: 'piraeus',
+        fromLocationId: 'athens',
         toLocationId: 'aegina',
-        distance: 27,
-        baseTravelTime: 120, // 2 hours
-        cost: 25,
+        distance: 30,
+        baseTravelTime: 150, // 2.5 hours
+        cost: 30,
         difficulty: RouteDifficulty.easy,
         possibleEncounters: ['pirate', 'merchant_ship', 'fisherman'],
         requiresShip: true,
@@ -96,11 +86,11 @@ class TravelRoutesData {
         description: 'Route to the sacred Olympic grounds',
       ),
 
-      // Dangerous sea routes
+      // Dangerous sea routes from Athens
       const TravelRoute(
-        fromLocationId: 'piraeus',
+        fromLocationId: 'athens',
         toLocationId: 'crete',
-        distance: 300,
+        distance: 320,
         baseTravelTime: 1440, // 24 hours
         cost: 200,
         difficulty: RouteDifficulty.dangerous,

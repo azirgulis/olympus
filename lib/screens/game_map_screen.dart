@@ -5,7 +5,9 @@ import '../providers/player_provider.dart';
 import '../providers/game_map_provider.dart';
 import '../models/game_map.dart';
 import '../data/map/travel_routes.dart';
+import '../widgets/map/interactive_map_widget.dart';
 import 'dialogs/travel_planning_dialog.dart';
+import 'dialogs/travel_encounter_dialog.dart';
 
 class GameMapScreen extends ConsumerStatefulWidget {
   const GameMapScreen({super.key});
@@ -17,10 +19,26 @@ class GameMapScreen extends ConsumerStatefulWidget {
 class _GameMapScreenState extends ConsumerState<GameMapScreen> {
   @override
   Widget build(BuildContext context) {
+    // Listen for encounters and journey completion
+    ref.listen<GameMapState>(gameMapProvider, (previous, current) {
+      if (current.currentJourney?.currentEncounter != null &&
+          previous?.currentJourney?.currentEncounter == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showEncounterDialog(current.currentJourney!.currentEncounter!);
+        });
+      }
+
+      // Handle journey completion and navigation
+      if (current.shouldNavigateToLocation != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _navigateToLocation(current.shouldNavigateToLocation!);
+          ref.read(gameMapProvider.notifier).clearNavigationFlag();
+        });
+      }
+    });
     final player = ref.watch(playerProvider);
     final currentLocation = ref.watch(currentLocationProvider);
     final unlockedLocations = ref.watch(unlockedLocationsProvider);
-    final availableDestinations = ref.watch(availableDestinationsProvider);
     final isJourneyInProgress = ref.watch(isJourneyInProgressProvider);
     final currentJourney = ref.watch(currentJourneyProvider);
 
@@ -64,11 +82,14 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
                               children: [
                                 const Icon(Icons.map, color: Colors.white, size: 28),
                                 const SizedBox(width: 8),
-                                Text(
-                                  'MAP OF ANCIENT GREECE',
-                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                Flexible(
+                                  child: Text(
+                                    'MAP OF ANCIENT GREECE',
+                                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -164,7 +185,7 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
               Expanded(
                 child: isJourneyInProgress
                     ? _buildJourneyView()
-                    : _buildMapView(unlockedLocations, availableDestinations),
+                    : _buildInteractiveMap(unlockedLocations),
               ),
             ],
           ),
@@ -174,44 +195,60 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
   }
 
   Widget _buildJourneyProgress(PlayerJourney journey) {
+    final isEncountering = journey.status == JourneyStatus.encountering;
+    final statusColor = isEncountering ? Colors.red : Colors.orange;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.orange.shade100,
+        color: statusColor.shade100,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.shade300, width: 2),
+        border: Border.all(color: statusColor.shade300, width: 2),
       ),
       child: Column(
         children: [
-          Text(
-            'Journey in Progress',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.orange.shade800,
-            ),
+          Row(
+            children: [
+              Icon(
+                isEncountering ? Icons.warning : Icons.directions_walk,
+                color: statusColor.shade800,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isEncountering ? 'Encounter!' : 'Journey in Progress',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: statusColor.shade800,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
             '${journey.fromLocationId.toUpperCase()} → ${journey.toLocationId.toUpperCase()}',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.orange.shade700,
+              color: statusColor.shade700,
             ),
           ),
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: journey.progressPercent / 100,
-            backgroundColor: Colors.orange.shade200,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.orange.shade600),
+            backgroundColor: statusColor.shade200,
+            valueColor: AlwaysStoppedAnimation<Color>(statusColor.shade600),
           ),
           const SizedBox(height: 8),
           Text(
-            '${journey.progressPercent}% Complete',
+            isEncountering
+              ? 'Journey paused - resolve encounter to continue'
+              : '${journey.progressPercent}% Complete',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.orange.shade700,
+              color: statusColor.shade700,
+              fontStyle: isEncountering ? FontStyle.italic : FontStyle.normal,
             ),
           ),
         ],
@@ -257,6 +294,27 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
             child: const Text('Cancel Journey'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildInteractiveMap(List<GameLocation> unlockedLocations) {
+    final player = ref.watch(playerProvider);
+
+    return InteractiveViewer(
+      boundaryMargin: const EdgeInsets.all(20),
+      minScale: 0.5,
+      maxScale: 3.0,
+      child: InteractiveMapWidget(
+        unlockedLocations: unlockedLocations,
+        currentLocationId: player.currentLocation,
+        currentJourney: ref.watch(currentJourneyProvider),
+        onLocationTapped: (location) {
+          final route = ref.read(gameMapProvider.notifier).getRouteToDestination(location.id);
+          if (route != null && location.id != player.currentLocation) {
+            _showTravelDialog(location, route);
+          }
+        },
       ),
     );
   }
@@ -536,6 +594,16 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
     );
   }
 
+  void _showEncounterDialog(TravelEncounter encounter) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Must choose an option
+      builder: (context) => TravelEncounterDialog(
+        encounter: encounter,
+      ),
+    );
+  }
+
   IconData _getLocationIcon(LocationType type) {
     switch (type) {
       case LocationType.cityState:
@@ -597,5 +665,33 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
         ],
       ),
     );
+  }
+
+  void _navigateToLocation(String locationId) {
+    // Navigate to the specific location screen
+    switch (locationId) {
+      case 'athens':
+        context.go('/athens');
+        break;
+      case 'thebes':
+        context.go('/thebes');
+        break;
+      case 'corinth':
+        context.go('/corinth');
+        break;
+      case 'sparta':
+        context.go('/sparta');
+        break;
+      case 'delphi':
+        context.go('/delphi');
+        break;
+      case 'marathon':
+        context.go('/marathon');
+        break;
+      default:
+        // For locations without specific screens, stay on map
+        print('No specific screen for location: $locationId');
+        break;
+    }
   }
 }
