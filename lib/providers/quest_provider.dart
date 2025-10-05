@@ -12,7 +12,10 @@ class QuestNotifier extends StateNotifier<List<Quest>> {
   }
 
   void _initializeQuests() {
-    final allQuests = [...MainQuests.getAllQuests(), ...SideQuests.getAllQuests()];
+    final allQuests = [
+      ...MainQuests.getAllMainQuests(),
+      ...SideQuests.getAllQuests(),
+    ];
     state = allQuests;
   }
 

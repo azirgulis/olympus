@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:go_router/go_router.dart';
@@ -31,13 +32,21 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
     state = state.copyWith(
       locations: locations,
       currentLocationId: 'athens', // Start in Athens
-      unlockedLocationIds: ['athens', 'marathon', 'thebes', 'corinth', 'delphi', 'sparta'], // Multiple destinations unlocked
+      unlockedLocationIds: [
+        'athens',
+        'marathon',
+        'thebes',
+        'corinth',
+        'delphi',
+        'sparta'
+      ], // Multiple destinations unlocked
     );
   }
 
   // Travel to a new location
   void startJourney(String destinationId, WidgetRef ref) {
-    final route = TravelRoutesData.getRoute(state.currentLocationId, destinationId);
+    final route =
+        TravelRoutesData.getRoute(state.currentLocationId, destinationId);
     if (route == null) return;
 
     final player = ref.read(playerProvider);
@@ -54,7 +63,8 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
       fromLocationId: state.currentLocationId,
       toLocationId: destinationId,
       startTime: DateTime.now(),
-      totalTravelTime: TravelRoutesData.calculateTravelTime(route, playerLevel: player.level),
+      totalTravelTime: TravelRoutesData.calculateTravelTime(route,
+          playerLevel: player.level),
       status: JourneyStatus.traveling,
       progressPercent: 0,
     );
@@ -104,10 +114,13 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
 
     final journey = state.currentJourney!;
     final elapsed = DateTime.now().difference(journey.startTime).inMinutes;
-    final progress = ((elapsed / journey.totalTravelTime) * 100).clamp(0, 100).round();
+    final progress =
+        ((elapsed / journey.totalTravelTime) * 100).clamp(0, 100).round();
 
     // Check for encounters at specific progress points
-    if (progress >= 25 && progress < 50 && journey.encountersCompleted.isEmpty) {
+    if (progress >= 25 &&
+        progress < 50 &&
+        journey.encountersCompleted.isEmpty) {
       _triggerRandomEncounter();
     } else if (progress >= 75 && journey.encountersCompleted.length < 2) {
       _triggerRandomEncounter();
@@ -163,7 +176,10 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
     }
 
     // Mark encounter as completed
-    final completedEncounters = [...state.currentJourney!.encountersCompleted, encounter.id];
+    final completedEncounters = [
+      ...state.currentJourney!.encountersCompleted,
+      encounter.id
+    ];
 
     state = state.copyWith(
       currentJourney: state.currentJourney!.copyWith(
@@ -202,17 +218,23 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
         break;
       case OutcomeType.loseItem:
         if (outcome.itemId.isNotEmpty) {
-          ref.read(inventoryProvider.notifier).removeItem(outcome.itemId, quantity: outcome.value);
+          ref
+              .read(inventoryProvider.notifier)
+              .removeItem(outcome.itemId, quantity: outcome.value);
         }
         break;
       case OutcomeType.gainReputation:
         if (outcome.itemId.isNotEmpty) {
-          ref.read(playerProvider.notifier).updateReputation(outcome.itemId, outcome.value);
+          ref
+              .read(playerProvider.notifier)
+              .updateReputation(outcome.itemId, outcome.value);
         }
         break;
       case OutcomeType.loseReputation:
         if (outcome.itemId.isNotEmpty) {
-          ref.read(playerProvider.notifier).updateReputation(outcome.itemId, -outcome.value);
+          ref
+              .read(playerProvider.notifier)
+              .updateReputation(outcome.itemId, -outcome.value);
         }
         break;
       case OutcomeType.gainKnowledge:
@@ -323,7 +345,10 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
 
   void _navigateToLocation(String locationId) {
     // This will be called by the UI to navigate
-    print('Journey complete! Should navigate to: $locationId');
+    if (kDebugMode) {
+      debugPrint(
+          'GameMapNotifier: journey complete -> navigate to $locationId');
+    }
   }
 
   void clearNavigationFlag() {
@@ -352,9 +377,43 @@ class GameMapNotifier extends StateNotifier<GameMapState> {
     );
   }
 
+  void moveInstantlyTo(String destinationId) {
+    final destination = LocationsData.getLocationById(destinationId);
+    if (destination == null) {
+      return;
+    }
+
+    final updatedLocations = state.locations.isEmpty
+        ? LocationsData.getAllLocations().map((location) {
+            if (location.id == destinationId) {
+              return location.copyWith(isVisited: true);
+            }
+            return location;
+          }).toList()
+        : state.locations.map((location) {
+            if (location.id == destinationId) {
+              return location.copyWith(isVisited: true);
+            }
+            return location;
+          }).toList();
+
+    final unlocked = {...state.unlockedLocationIds, destinationId};
+    unlocked.addAll(destination.connectedLocations);
+
+    state = state.copyWith(
+      currentLocationId: destinationId,
+      locations: updatedLocations,
+      unlockedLocationIds: unlocked.toList(),
+      currentJourney: null,
+      isJourneyInProgress: false,
+      shouldNavigateToLocation: null,
+    );
+  }
+
   // Get available destinations from current location
   List<GameLocation> getAvailableDestinations() {
-    final currentLocation = LocationsData.getLocationById(state.currentLocationId);
+    final currentLocation =
+        LocationsData.getLocationById(state.currentLocationId);
     if (currentLocation == null) return [];
 
     return currentLocation.connectedLocations
@@ -376,16 +435,19 @@ class GameMapState with _$GameMapState {
   const factory GameMapState({
     @Default([]) List<GameLocation> locations,
     @Default('athens') String currentLocationId,
-    @Default(['athens', 'marathon', 'thebes', 'corinth', 'delphi', 'sparta']) List<String> unlockedLocationIds,
+    @Default(['athens', 'marathon', 'thebes', 'corinth', 'delphi', 'sparta'])
+    List<String> unlockedLocationIds,
     @Default(false) bool isJourneyInProgress,
     PlayerJourney? currentJourney,
     String? shouldNavigateToLocation,
   }) = _GameMapState;
 
-  factory GameMapState.fromJson(Map<String, dynamic> json) => _$GameMapStateFromJson(json);
+  factory GameMapState.fromJson(Map<String, dynamic> json) =>
+      _$GameMapStateFromJson(json);
 }
 
-final gameMapProvider = StateNotifierProvider<GameMapNotifier, GameMapState>((ref) {
+final gameMapProvider =
+    StateNotifierProvider<GameMapNotifier, GameMapState>((ref) {
   return GameMapNotifier();
 });
 

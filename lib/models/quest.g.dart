@@ -72,6 +72,7 @@ const _$QuestDifficultyEnumMap = {
   QuestDifficulty.medium: 'medium',
   QuestDifficulty.hard: 'hard',
   QuestDifficulty.expert: 'expert',
+  QuestDifficulty.veryHard: 'veryHard',
 };
 
 const _$QuestStatusEnumMap = {
@@ -114,6 +115,8 @@ const _$ObjectiveTypeEnumMap = {
   ObjectiveType.earn: 'earn',
   ObjectiveType.spend: 'spend',
   ObjectiveType.craft: 'craft',
+  ObjectiveType.travel: 'travel',
+  ObjectiveType.custom: 'custom',
 };
 
 _$QuestRewardImpl _$$QuestRewardImplFromJson(Map<String, dynamic> json) =>

@@ -9,6 +9,10 @@ class InteractiveMapWidget extends StatefulWidget {
   final String currentLocationId;
   final Function(GameLocation) onLocationTapped;
   final PlayerJourney? currentJourney;
+  final VoidCallback? onAvatarTapped;
+  final Offset? travelerPositionOverride;
+  final Offset? travelerStartOverride;
+  final Offset? travelerDestinationOverride;
 
   const InteractiveMapWidget({
     super.key,
@@ -16,6 +20,10 @@ class InteractiveMapWidget extends StatefulWidget {
     required this.currentLocationId,
     required this.onLocationTapped,
     this.currentJourney,
+    this.onAvatarTapped,
+    this.travelerPositionOverride,
+    this.travelerStartOverride,
+    this.travelerDestinationOverride,
   });
 
   @override
@@ -32,6 +40,9 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
         currentLocationId: widget.currentLocationId,
         onLocationTapped: widget.onLocationTapped,
         currentJourney: widget.currentJourney,
+        travelerPositionOverride: widget.travelerPositionOverride,
+        travelerStartOverride: widget.travelerStartOverride,
+        travelerDestinationOverride: widget.travelerDestinationOverride,
       ),
     );
   }
@@ -48,6 +59,15 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
     // Define clickable regions for each location
     final locationRegions = _getLocationRegions();
 
+    // Check if tap was on the current avatar first
+    final currentRegion = locationRegions[widget.currentLocationId];
+    if (widget.onAvatarTapped != null && currentRegion != null) {
+      if (_isPointInRegion(relativeX, relativeY, currentRegion)) {
+        widget.onAvatarTapped!.call();
+        return;
+      }
+    }
+
     // Check if tap is within any location region
     for (final entry in locationRegions.entries) {
       final locationId = entry.key;
@@ -57,7 +77,8 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
         final location = LocationsData.getLocationById(locationId);
         if (location != null) {
           // Only trigger if location is unlocked
-          final isUnlocked = widget.unlockedLocations.any((loc) => loc.id == locationId);
+          final isUnlocked =
+              widget.unlockedLocations.any((loc) => loc.id == locationId);
           if (isUnlocked) {
             widget.onLocationTapped(location);
             _showLocationPreview(context, location);
@@ -205,23 +226,27 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 6,
-                    children: location.specialties.take(4).map((specialty) =>
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          specialty,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blue.shade700,
-                            fontWeight: FontWeight.bold,
+                    children: location.specialties
+                        .take(4)
+                        .map(
+                          (specialty) => Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              specialty,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ).toList(),
+                        )
+                        .toList(),
                   ),
                 ],
                 const SizedBox(height: 16),

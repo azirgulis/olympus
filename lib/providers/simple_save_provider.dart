@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/storage_service.dart';
 import '../models/player.dart';
@@ -21,7 +22,8 @@ class SaveGameService {
       // Convert market data to serializable format
       final marketData = <String, dynamic>{};
       for (final entry in market.entries) {
-        marketData[entry.key] = entry.value.map((item) => item.toJson()).toList();
+        marketData[entry.key] =
+            entry.value.map((item) => item.toJson()).toList();
       }
 
       await StorageService.saveGame(
@@ -33,13 +35,17 @@ class SaveGameService {
       );
 
       return true;
-    } catch (e) {
-      print('Error saving game: $e');
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('SaveGameService: save failed -> $e');
+        debugPrint('$stackTrace');
+      }
       return false;
     }
   }
 
-  static Future<bool> loadGame(WidgetRef ref, {String saveSlot = 'current'}) async {
+  static Future<bool> loadGame(WidgetRef ref,
+      {String saveSlot = 'current'}) async {
     try {
       final saveData = await StorageService.loadGame(saveSlot: saveSlot);
 
@@ -57,8 +63,11 @@ class SaveGameService {
       }
 
       return true;
-    } catch (e) {
-      print('Error loading game: $e');
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('SaveGameService: load failed -> $e');
+        debugPrint('$stackTrace');
+      }
       return false;
     }
   }
@@ -73,7 +82,8 @@ class SaveGameService {
       // Convert market data to serializable format
       final marketData = <String, dynamic>{};
       for (final entry in market.entries) {
-        marketData[entry.key] = entry.value.map((item) => item.toJson()).toList();
+        marketData[entry.key] =
+            entry.value.map((item) => item.toJson()).toList();
       }
 
       await StorageService.autoSave(
@@ -82,9 +92,12 @@ class SaveGameService {
         inventory: inventory.items,
         marketData: marketData,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Auto-save failures shouldn't interrupt gameplay
-      print('Auto-save failed: $e');
+      if (kDebugMode) {
+        debugPrint('SaveGameService: auto-save failed -> $e');
+        debugPrint('$stackTrace');
+      }
     }
   }
 }
@@ -92,9 +105,9 @@ class SaveGameService {
 // Helper methods to load data without accessing protected state
 void loadPlayerData(WidgetRef ref, Player player) {
   ref.read(playerProvider.notifier).createNewPlayer(
-    name: player.name,
-    characterClass: player.characterClass,
-  );
+        name: player.name,
+        characterClass: player.characterClass,
+      );
   // Manually update other fields
   final notifier = ref.read(playerProvider.notifier);
   notifier.updateHealth(player.health);
@@ -145,6 +158,7 @@ final availableSaveSlotsProvider = Provider<List<String>>((ref) {
 });
 
 // Provider for getting save metadata
-final saveMetadataProvider = Provider.family<SaveMetadata?, String>((ref, saveSlot) {
+final saveMetadataProvider =
+    Provider.family<SaveMetadata?, String>((ref, saveSlot) {
   return StorageService.getSaveMetadata(saveSlot: saveSlot);
 });

@@ -533,6 +533,8 @@ class _QuestScreenState extends ConsumerState<QuestScreen>
         return Colors.red;
       case QuestDifficulty.expert:
         return Colors.purple;
+      case QuestDifficulty.veryHard:
+        return Colors.deepPurple;
     }
   }
 

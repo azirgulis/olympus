@@ -33,6 +33,11 @@ mixin _$Player {
   List<String> get completedQuests => throw _privateConstructorUsedError;
   List<String> get activeQuests => throw _privateConstructorUsedError;
   Map<String, bool> get storyFlags => throw _privateConstructorUsedError;
+  Map<String, int> get inventory =>
+      throw _privateConstructorUsedError; // itemId -> quantity
+  Map<String, String> get equippedItems =>
+      throw _privateConstructorUsedError; // slot -> itemId (weapon, armor, accessory)
+  List<String> get unlockedAchievements => throw _privateConstructorUsedError;
 
   /// Serializes this Player to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -61,7 +66,10 @@ abstract class $PlayerCopyWith<$Res> {
       String currentLocation,
       List<String> completedQuests,
       List<String> activeQuests,
-      Map<String, bool> storyFlags});
+      Map<String, bool> storyFlags,
+      Map<String, int> inventory,
+      Map<String, String> equippedItems,
+      List<String> unlockedAchievements});
 }
 
 /// @nodoc
@@ -92,6 +100,9 @@ class _$PlayerCopyWithImpl<$Res, $Val extends Player>
     Object? completedQuests = null,
     Object? activeQuests = null,
     Object? storyFlags = null,
+    Object? inventory = null,
+    Object? equippedItems = null,
+    Object? unlockedAchievements = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -146,6 +157,18 @@ class _$PlayerCopyWithImpl<$Res, $Val extends Player>
           ? _value.storyFlags
           : storyFlags // ignore: cast_nullable_to_non_nullable
               as Map<String, bool>,
+      inventory: null == inventory
+          ? _value.inventory
+          : inventory // ignore: cast_nullable_to_non_nullable
+              as Map<String, int>,
+      equippedItems: null == equippedItems
+          ? _value.equippedItems
+          : equippedItems // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+      unlockedAchievements: null == unlockedAchievements
+          ? _value.unlockedAchievements
+          : unlockedAchievements // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -170,7 +193,10 @@ abstract class _$$PlayerImplCopyWith<$Res> implements $PlayerCopyWith<$Res> {
       String currentLocation,
       List<String> completedQuests,
       List<String> activeQuests,
-      Map<String, bool> storyFlags});
+      Map<String, bool> storyFlags,
+      Map<String, int> inventory,
+      Map<String, String> equippedItems,
+      List<String> unlockedAchievements});
 }
 
 /// @nodoc
@@ -199,6 +225,9 @@ class __$$PlayerImplCopyWithImpl<$Res>
     Object? completedQuests = null,
     Object? activeQuests = null,
     Object? storyFlags = null,
+    Object? inventory = null,
+    Object? equippedItems = null,
+    Object? unlockedAchievements = null,
   }) {
     return _then(_$PlayerImpl(
       name: null == name
@@ -253,13 +282,25 @@ class __$$PlayerImplCopyWithImpl<$Res>
           ? _value._storyFlags
           : storyFlags // ignore: cast_nullable_to_non_nullable
               as Map<String, bool>,
+      inventory: null == inventory
+          ? _value._inventory
+          : inventory // ignore: cast_nullable_to_non_nullable
+              as Map<String, int>,
+      equippedItems: null == equippedItems
+          ? _value._equippedItems
+          : equippedItems // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+      unlockedAchievements: null == unlockedAchievements
+          ? _value._unlockedAchievements
+          : unlockedAchievements // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$PlayerImpl implements _Player {
+class _$PlayerImpl extends _Player {
   const _$PlayerImpl(
       {this.name = '',
       this.characterClass = CharacterClass.merchant,
@@ -273,12 +314,19 @@ class _$PlayerImpl implements _Player {
       this.currentLocation = 'athens',
       final List<String> completedQuests = const [],
       final List<String> activeQuests = const [],
-      final Map<String, bool> storyFlags = const {}})
+      final Map<String, bool> storyFlags = const {},
+      final Map<String, int> inventory = const {},
+      final Map<String, String> equippedItems = const {},
+      final List<String> unlockedAchievements = const []})
       : _reputation = reputation,
         _skills = skills,
         _completedQuests = completedQuests,
         _activeQuests = activeQuests,
-        _storyFlags = storyFlags;
+        _storyFlags = storyFlags,
+        _inventory = inventory,
+        _equippedItems = equippedItems,
+        _unlockedAchievements = unlockedAchievements,
+        super._();
 
   factory _$PlayerImpl.fromJson(Map<String, dynamic> json) =>
       _$$PlayerImplFromJson(json);
@@ -352,9 +400,41 @@ class _$PlayerImpl implements _Player {
     return EqualUnmodifiableMapView(_storyFlags);
   }
 
+  final Map<String, int> _inventory;
+  @override
+  @JsonKey()
+  Map<String, int> get inventory {
+    if (_inventory is EqualUnmodifiableMapView) return _inventory;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_inventory);
+  }
+
+// itemId -> quantity
+  final Map<String, String> _equippedItems;
+// itemId -> quantity
+  @override
+  @JsonKey()
+  Map<String, String> get equippedItems {
+    if (_equippedItems is EqualUnmodifiableMapView) return _equippedItems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_equippedItems);
+  }
+
+// slot -> itemId (weapon, armor, accessory)
+  final List<String> _unlockedAchievements;
+// slot -> itemId (weapon, armor, accessory)
+  @override
+  @JsonKey()
+  List<String> get unlockedAchievements {
+    if (_unlockedAchievements is EqualUnmodifiableListView)
+      return _unlockedAchievements;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_unlockedAchievements);
+  }
+
   @override
   String toString() {
-    return 'Player(name: $name, characterClass: $characterClass, health: $health, energy: $energy, drachmae: $drachmae, level: $level, experience: $experience, reputation: $reputation, skills: $skills, currentLocation: $currentLocation, completedQuests: $completedQuests, activeQuests: $activeQuests, storyFlags: $storyFlags)';
+    return 'Player(name: $name, characterClass: $characterClass, health: $health, energy: $energy, drachmae: $drachmae, level: $level, experience: $experience, reputation: $reputation, skills: $skills, currentLocation: $currentLocation, completedQuests: $completedQuests, activeQuests: $activeQuests, storyFlags: $storyFlags, inventory: $inventory, equippedItems: $equippedItems, unlockedAchievements: $unlockedAchievements)';
   }
 
   @override
@@ -382,7 +462,13 @@ class _$PlayerImpl implements _Player {
             const DeepCollectionEquality()
                 .equals(other._activeQuests, _activeQuests) &&
             const DeepCollectionEquality()
-                .equals(other._storyFlags, _storyFlags));
+                .equals(other._storyFlags, _storyFlags) &&
+            const DeepCollectionEquality()
+                .equals(other._inventory, _inventory) &&
+            const DeepCollectionEquality()
+                .equals(other._equippedItems, _equippedItems) &&
+            const DeepCollectionEquality()
+                .equals(other._unlockedAchievements, _unlockedAchievements));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -401,7 +487,10 @@ class _$PlayerImpl implements _Player {
       currentLocation,
       const DeepCollectionEquality().hash(_completedQuests),
       const DeepCollectionEquality().hash(_activeQuests),
-      const DeepCollectionEquality().hash(_storyFlags));
+      const DeepCollectionEquality().hash(_storyFlags),
+      const DeepCollectionEquality().hash(_inventory),
+      const DeepCollectionEquality().hash(_equippedItems),
+      const DeepCollectionEquality().hash(_unlockedAchievements));
 
   /// Create a copy of Player
   /// with the given fields replaced by the non-null parameter values.
@@ -419,7 +508,7 @@ class _$PlayerImpl implements _Player {
   }
 }
 
-abstract class _Player implements Player {
+abstract class _Player extends Player {
   const factory _Player(
       {final String name,
       final CharacterClass characterClass,
@@ -433,7 +522,11 @@ abstract class _Player implements Player {
       final String currentLocation,
       final List<String> completedQuests,
       final List<String> activeQuests,
-      final Map<String, bool> storyFlags}) = _$PlayerImpl;
+      final Map<String, bool> storyFlags,
+      final Map<String, int> inventory,
+      final Map<String, String> equippedItems,
+      final List<String> unlockedAchievements}) = _$PlayerImpl;
+  const _Player._() : super._();
 
   factory _Player.fromJson(Map<String, dynamic> json) = _$PlayerImpl.fromJson;
 
@@ -463,6 +556,13 @@ abstract class _Player implements Player {
   List<String> get activeQuests;
   @override
   Map<String, bool> get storyFlags;
+  @override
+  Map<String, int> get inventory; // itemId -> quantity
+  @override
+  Map<String, String>
+      get equippedItems; // slot -> itemId (weapon, armor, accessory)
+  @override
+  List<String> get unlockedAchievements;
 
   /// Create a copy of Player
   /// with the given fields replaced by the non-null parameter values.

@@ -1,11 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/player_provider.dart';
 import '../providers/game_map_provider.dart';
+import '../providers/game_state_provider.dart';
 import '../models/game_map.dart';
 import '../data/map/travel_routes.dart';
 import '../widgets/map/interactive_map_widget.dart';
+import '../widgets/map/ancient_greece_map.dart';
 import 'dialogs/travel_planning_dialog.dart';
 import 'dialogs/travel_encounter_dialog.dart';
 
@@ -16,7 +19,46 @@ class GameMapScreen extends ConsumerStatefulWidget {
   ConsumerState<GameMapScreen> createState() => _GameMapScreenState();
 }
 
-class _GameMapScreenState extends ConsumerState<GameMapScreen> {
+class _GameMapScreenState extends ConsumerState<GameMapScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _quickTravelController;
+  Animation<Offset>? _quickTravelAnimation;
+  Offset? _quickTravelStart;
+  Offset? _quickTravelDestination;
+  Offset? _quickTravelCurrent;
+  String? _quickTravelDestinationId;
+  bool _isQuickTravelActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _quickTravelController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _quickTravelController.addListener(() {
+      if (!mounted || _quickTravelAnimation == null) {
+        return;
+      }
+      setState(() {
+        _quickTravelCurrent = _quickTravelAnimation!.value;
+      });
+    });
+
+    _quickTravelController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _onQuickTravelCompleted();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _quickTravelController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Listen for encounters and journey completion
@@ -80,15 +122,19 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.map, color: Colors.white, size: 28),
+                                const Icon(Icons.map,
+                                    color: Colors.white, size: 28),
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Text(
                                     'MAP OF ANCIENT GREECE',
-                                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -103,11 +149,14 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildStatChip(Icons.favorite, player.health, Colors.red),
+                        _buildStatChip(
+                            Icons.favorite, player.health, Colors.red),
                         const SizedBox(width: 8),
-                        _buildStatChip(Icons.flash_on, player.energy, Colors.yellow),
+                        _buildStatChip(
+                            Icons.flash_on, player.energy, Colors.yellow),
                         const SizedBox(width: 8),
-                        _buildStatChip(Icons.monetization_on, player.drachmae, Colors.amber),
+                        _buildStatChip(Icons.monetization_on, player.drachmae,
+                            Colors.amber),
                         const SizedBox(width: 8),
                         _buildStatChip(Icons.star, player.level, Colors.purple),
                       ],
@@ -166,12 +215,12 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
                       ),
                       if (currentLocation.id == 'athens')
                         ElevatedButton(
-                          onPressed: () => context.go('/athens'),
+                          onPressed: () => context.go('/explore/athens'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue.shade700,
                             foregroundColor: Colors.white,
                           ),
-                          child: const Text('Enter'),
+                          child: const Text('Explore'),
                         ),
                     ],
                   ),
@@ -243,8 +292,8 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
           const SizedBox(height: 8),
           Text(
             isEncountering
-              ? 'Journey paused - resolve encounter to continue'
-              : '${journey.progressPercent}% Complete',
+                ? 'Journey paused - resolve encounter to continue'
+                : '${journey.progressPercent}% Complete',
             style: TextStyle(
               fontSize: 12,
               color: statusColor.shade700,
@@ -270,17 +319,17 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
           Text(
             'Traveling...',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             'Keep an eye out for encounters!',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white70,
-              fontStyle: FontStyle.italic,
-            ),
+                  color: Colors.white70,
+                  fontStyle: FontStyle.italic,
+                ),
           ),
           const SizedBox(height: 32),
           ElevatedButton(
@@ -309,8 +358,17 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
         unlockedLocations: unlockedLocations,
         currentLocationId: player.currentLocation,
         currentJourney: ref.watch(currentJourneyProvider),
+        travelerPositionOverride: _quickTravelCurrent,
+        travelerStartOverride: _quickTravelStart,
+        travelerDestinationOverride: _quickTravelDestination,
+        onAvatarTapped: _handleAvatarTapped,
         onLocationTapped: (location) {
-          final route = ref.read(gameMapProvider.notifier).getRouteToDestination(location.id);
+          if (_isQuickTravelActive) {
+            return;
+          }
+          final route = ref
+              .read(gameMapProvider.notifier)
+              .getRouteToDestination(location.id);
           if (route != null && location.id != player.currentLocation) {
             _showTravelDialog(location, route);
           }
@@ -319,7 +377,8 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
     );
   }
 
-  Widget _buildMapView(List<GameLocation> unlockedLocations, List<GameLocation> availableDestinations) {
+  Widget _buildMapView(List<GameLocation> unlockedLocations,
+      List<GameLocation> availableDestinations) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -340,7 +399,6 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
           if (availableDestinations.isEmpty)
             Container(
               padding: const EdgeInsets.all(32),
@@ -370,10 +428,9 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
               ),
             )
           else
-            ...availableDestinations.map((destination) => _buildDestinationCard(destination)),
-
+            ...availableDestinations
+                .map((destination) => _buildDestinationCard(destination)),
           const SizedBox(height: 24),
-
           Text(
             'All Known Locations',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -389,15 +446,191 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
           ...unlockedLocations.map((location) => _buildLocationCard(location)),
         ],
       ),
     );
   }
 
+  void _handleAvatarTapped() {
+    if (_isQuickTravelActive || ref.read(isJourneyInProgressProvider)) {
+      return;
+    }
+    _showQuickTravelSheet();
+  }
+
+  Future<void> _showQuickTravelSheet() async {
+    final unlockedLocations = ref.read(unlockedLocationsProvider);
+    final currentLocationId = ref.read(gameMapProvider).currentLocationId;
+
+    final destinations = unlockedLocations
+        .where((location) => location.id != currentLocationId)
+        .toList();
+
+    if (destinations.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No other cities unlocked yet.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
+
+    final selectedId = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Select your destination',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF8B4513),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 360),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    final location = destinations[index];
+                    return ListTile(
+                      leading: const Icon(Icons.navigation, color: Colors.blue),
+                      title: Text(location.name),
+                      subtitle: Text(
+                        location.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () => Navigator.of(context).pop(location.id),
+                    );
+                  },
+                  separatorBuilder: (_, __) => const Divider(height: 0),
+                  itemCount: destinations.length,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selectedId != null) {
+      _beginQuickTravel(selectedId);
+    }
+  }
+
+  void _beginQuickTravel(String destinationId) {
+    if (_isQuickTravelActive) {
+      return;
+    }
+
+    final currentLocationId = ref.read(gameMapProvider).currentLocationId;
+    if (currentLocationId == destinationId) {
+      return;
+    }
+
+    final route =
+        ref.read(gameMapProvider.notifier).getRouteToDestination(destinationId);
+    if (route == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No known route to that city yet.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
+
+    final start = _mapPositionFor(currentLocationId);
+    final end = _mapPositionFor(destinationId);
+
+    if (start == null || end == null) {
+      return;
+    }
+
+    _quickTravelController.stop();
+
+    final animation = Tween<Offset>(begin: start, end: end).animate(
+      CurvedAnimation(
+        parent: _quickTravelController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    setState(() {
+      _quickTravelStart = start;
+      _quickTravelDestination = end;
+      _quickTravelDestinationId = destinationId;
+      _quickTravelAnimation = animation;
+      _quickTravelCurrent = start;
+      _isQuickTravelActive = true;
+    });
+
+    _quickTravelController.forward(from: 0);
+  }
+
+  Offset? _mapPositionFor(String locationId) {
+    return ancientGreeceLocationOffset(locationId);
+  }
+
+  void _onQuickTravelCompleted() {
+    final destinationId = _quickTravelDestinationId;
+    if (destinationId == null) {
+      return;
+    }
+
+    ref.read(gameMapProvider.notifier).moveInstantlyTo(destinationId);
+    ref.read(playerProvider.notifier).updateLocation(destinationId);
+    ref.read(gameStateProvider.notifier).changeLocation(destinationId);
+
+    if (mounted) {
+      setState(() {
+        _quickTravelCurrent = null;
+        _quickTravelStart = null;
+        _quickTravelDestination = null;
+        _quickTravelDestinationId = null;
+        _quickTravelAnimation = null;
+        _isQuickTravelActive = false;
+      });
+    }
+
+    _quickTravelController.reset();
+  }
+
   Widget _buildDestinationCard(GameLocation destination) {
-    final route = ref.read(gameMapProvider.notifier).getRouteToDestination(destination.id);
+    final route = ref
+        .read(gameMapProvider.notifier)
+        .getRouteToDestination(destination.id);
     final player = ref.watch(playerProvider);
 
     return Container(
@@ -450,14 +683,16 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
+                  Icon(Icons.access_time,
+                      size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 4),
                   Text(
                     '${TravelRoutesData.calculateTravelTime(route, playerLevel: player.level)} min',
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                   const SizedBox(width: 12),
-                  Icon(Icons.monetization_on, size: 14, color: Colors.grey.shade600),
+                  Icon(Icons.monetization_on,
+                      size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 4),
                   Text(
                     '${TravelRoutesData.calculateTravelCost(route, playerLevel: player.level)} δ',
@@ -469,7 +704,9 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
           ],
         ),
         trailing: ElevatedButton(
-          onPressed: route != null ? () => _showTravelDialog(destination, route) : null,
+          onPressed: route != null
+              ? () => _showTravelDialog(destination, route)
+              : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green.shade700,
             foregroundColor: Colors.white,
@@ -490,7 +727,8 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
         color: Colors.white.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCurrentLocation ? Colors.blue.shade300 : Colors.grey.shade300,
+          color:
+              isCurrentLocation ? Colors.blue.shade300 : Colors.grey.shade300,
           width: isCurrentLocation ? 2 : 1,
         ),
         boxShadow: [
@@ -522,7 +760,9 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: isCurrentLocation ? Colors.blue.shade700 : const Color(0xFF2E86AB),
+                color: isCurrentLocation
+                    ? Colors.blue.shade700
+                    : const Color(0xFF2E86AB),
               ),
             ),
             if (isCurrentLocation) ...[
@@ -563,19 +803,23 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
               const SizedBox(height: 4),
               Wrap(
                 spacing: 4,
-                children: location.specialties.take(3).map((specialty) =>
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      specialty,
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  ),
-                ).toList(),
+                children: location.specialties
+                    .take(3)
+                    .map(
+                      (specialty) => Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          specialty,
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ],
@@ -690,7 +934,9 @@ class _GameMapScreenState extends ConsumerState<GameMapScreen> {
         break;
       default:
         // For locations without specific screens, stay on map
-        print('No specific screen for location: $locationId');
+        if (kDebugMode) {
+          debugPrint('GameMapScreen: no route configured for "$locationId"');
+        }
         break;
     }
   }

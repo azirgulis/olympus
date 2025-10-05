@@ -70,6 +70,7 @@ enum QuestDifficulty {
   medium,
   hard,
   expert,
+  veryHard,
 }
 
 enum QuestStatus {
@@ -89,6 +90,8 @@ enum ObjectiveType {
   earn,
   spend,
   craft,
+  travel,
+  custom,
 }
 
 enum RewardType {

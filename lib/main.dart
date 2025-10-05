@@ -75,9 +75,9 @@ class MainMenuScreen extends StatelessWidget {
               Text(
                 'Economic Myths',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.white70,
-                ),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white70,
+                    ),
               ),
               const SizedBox(height: 48),
 
@@ -99,7 +99,7 @@ class MainMenuScreen extends StatelessWidget {
               MenuButton(
                 text: 'Settings',
                 onPressed: () {
-                  // TODO: Navigate to settings
+                  context.go('/settings');
                 },
               ),
             ],

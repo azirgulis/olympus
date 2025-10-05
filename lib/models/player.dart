@@ -5,6 +5,8 @@ part 'player.g.dart';
 
 @freezed
 class Player with _$Player {
+  const Player._();
+
   const factory Player({
     @Default('') String name,
     @Default(CharacterClass.merchant) CharacterClass characterClass,
@@ -19,6 +21,9 @@ class Player with _$Player {
     @Default([]) List<String> completedQuests,
     @Default([]) List<String> activeQuests,
     @Default({}) Map<String, bool> storyFlags,
+    @Default({}) Map<String, int> inventory, // itemId -> quantity
+    @Default({}) Map<String, String> equippedItems, // slot -> itemId (weapon, armor, accessory)
+    @Default([]) List<String> unlockedAchievements, // achievement IDs
   }) = _Player;
 
   factory Player.fromJson(Map<String, Object?> json) => _$PlayerFromJson(json);

@@ -201,6 +201,12 @@ class _AthensScreenState extends ConsumerState<AthensScreen> {
                         childAspectRatio: 1.0,
                         children: [
                           _buildActionCard(
+                            'Explore City',
+                            'Walk around Athens\nExplore the city',
+                            Icons.explore,
+                            () => context.push('/explore/athens'),
+                          ),
+                          _buildActionCard(
                             'Marketplace',
                             'Buy and sell goods\nLearn supply & demand',
                             Icons.storefront,

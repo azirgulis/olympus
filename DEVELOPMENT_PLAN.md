@@ -1,402 +1,521 @@
 # Development Plan - Odyssey of Olympus: Economic Myths
+*Revised: Wrath of the Gods-Inspired Adventure RPG*
 
-**Target Timeline:** 6 months
+**Target Timeline:** 8 months
 **Start Date:** [Add your start date]
-**Current Phase:** Phase 1 - Core Framework
+**Current Phase:** Phase 1 - Core Exploration & Movement
+**Game Vision:** Open-world 2D exploration RPG where players learn economics through missions, trade, and puzzle-based challenges
 
 ---
 
-## Phase 1: Core Framework (Months 1-2)
-*Goal: Playable demo with Athens hub and basic mechanics*
+## 🎮 Core Game Loop
 
-### Project Setup & Architecture
-- [x] Initialize Flutter project with proper folder structure
-  - [x] Create `lib/` subfolders: models, providers, screens, widgets, services, utils
-  - [x] Set up `assets/` folders: images, audio, data
-  - [x] Configure `pubspec.yaml` with all required dependencies
-- [ ] Set up version control and development environment
-  - [x] Initialize Git repository
-  - [x] Create `.gitignore` for Flutter projects
-  - [ ] Set up GitHub repository and push code
-  - [ ] Set up IDE configuration (VS Code/Android Studio)
-- [x] Configure Riverpod state management
-  - [x] Add ProviderScope to main app
-  - [x] Create base provider structure
-  - [x] Set up provider observer for debugging
-
-### Core Data Models
-- [x] Implement Player model (`lib/models/player.dart`)
-  - [x] Player stats (health, energy, skills, reputation)
-  - [x] Character class selection (Merchant/Scholar/Warrior)
-  - [x] Serialization with Freezed and JSON
-- [x] Create Inventory system (`lib/models/inventory.dart`)
-  - [x] Item model with types, values, descriptions
-  - [x] Inventory management with slot limitations
-  - [x] Resource tracking (Food, Water, Drachmae, Tools)
-- [ ] Build Location model (`lib/models/location.dart`)
-  - [ ] Location properties and available actions
-  - [ ] Market data and pricing information
-  - [ ] Connection to other locations
-- [ ] Design Quest system (`lib/models/quest.dart`)
-  - [ ] Quest states and progression tracking
-  - [ ] Rewards and requirements system
-  - [ ] Branching quest logic
-
-### State Management with Riverpod
-- [ ] GameStateProvider (`lib/providers/game_state_provider.dart`)
-  - [ ] Current location and game progress
-  - [ ] Story flags and unlocked content
-  - [ ] Game difficulty and settings
-- [x] PlayerProvider (`lib/providers/player_provider.dart`)
-  - [x] Player stats and character management
-  - [x] Skill progression and leveling
-  - [x] Reputation tracking with gods/cities
-- [x] InventoryProvider (`lib/providers/inventory_provider.dart`)
-  - [x] Real-time inventory updates
-  - [x] Item usage and trading logic
-  - [x] Resource consumption tracking
-- [ ] MarketProvider (`lib/providers/market_provider.dart`)
-  - [ ] Dynamic pricing algorithms
-  - [ ] Supply and demand simulation
-  - [ ] Market event effects
-
-### Core UI Components
-- [ ] Create app theme and styling (`lib/theme/`)
-  - [ ] Greek mythology-inspired color palette
-  - [ ] Custom text styles and typography
-  - [ ] Button and widget themes
-- [ ] Build reusable game widgets (`lib/widgets/`)
-  - [ ] GameButton with custom styling
-  - [ ] ResourceBar for tracking stats
-  - [ ] InventorySlot for item display
-  - [ ] DialogueBox for conversations
-- [ ] Implement navigation system (`lib/routing/`)
-  - [ ] GoRouter configuration
-  - [ ] Screen transition animations
-  - [ ] Deep linking support
-
-### Basic Screens Implementation
-- [x] Main Menu Screen (`lib/screens/main_menu_screen.dart`)
-  - [x] New game, continue, settings options
-  - [ ] Character class selection
-  - [ ] Difficulty mode selection
-- [ ] Game Map Screen (`lib/screens/game_map_screen.dart`)
-  - [ ] Interactive map of ancient Greece
-  - [ ] Location tap navigation
-  - [ ] Current position indicator
-- [ ] Inventory Screen (`lib/screens/inventory_screen.dart`)
-  - [ ] Grid-based item display
-  - [ ] Drag-and-drop functionality
-  - [ ] Item details and usage options
-- [ ] Player Stats Screen (`lib/screens/player_stats_screen.dart`)
-  - [ ] Health, energy, and skill displays
-  - [ ] Reputation meters
-  - [ ] Achievement progress
-
-### Data Persistence
-- [ ] Set up Hive database (`lib/services/storage_service.dart`)
-  - [ ] Player save data structure
-  - [ ] Game progress persistence
-  - [ ] Settings and preferences storage
-- [ ] Implement save/load functionality
-  - [ ] Auto-save on important events
-  - [ ] Manual save option
-  - [ ] Multiple save slot support
-
-### Basic Game Mechanics
-- [ ] Travel system implementation
-  - [ ] Resource consumption during travel
-  - [ ] Random event triggering
-  - [ ] Location unlocking logic
-- [ ] Basic inventory management
-  - [ ] Item pickup and usage
-  - [ ] Resource tracking and alerts
-  - [ ] Scarcity mechanics
-- [ ] Simple trading system
-  - [ ] Buy/sell interface
-  - [ ] Price calculation
-  - [ ] Market availability
-
-**Phase 1 Deliverable:** Playable demo with Athens hub, basic inventory, character creation, and map navigation
+1. **Explore** → Walk around 2D map, discover NPCs and locations
+2. **Accept Missions** → Talk to NPCs, get complex multi-step quests
+3. **Earn Money** → Complete missions, trade between cities, run port expeditions
+4. **Buy Equipment** → Spend drachmae on gear, ships, information, consumables
+5. **Progress** → Unlock new areas, advance main story, build reputation
 
 ---
 
-## Phase 2: Content Creation (Months 3-4)
-*Goal: Alpha build with full main quest line*
+## Phase 1: Core Exploration & Movement System (Months 1-2)
+*Goal: Playable 2D exploration with one city (Athens) fully functional*
 
-### Location Development
-- [ ] Athens Hub Implementation (`lib/screens/locations/athens_screen.dart`)
-  - [ ] Marketplace with tutorial trading
-  - [ ] Philosopher NPCs teaching supply/demand
-  - [ ] Starting quests and character backstory
-- [ ] Sparta Military Outpost (`lib/screens/locations/sparta_screen.dart`)
-  - [ ] War council resource allocation puzzle
-  - [ ] Opportunity cost decision scenarios
-  - [ ] Spartan training mini-game
-- [ ] Delphi Oracle Temple (`lib/screens/locations/delphi_screen.dart`)
-  - [ ] Prophecy system with economics riddles
-  - [ ] Apollo consultation mechanics
-  - [ ] Market forecasting lessons
-- [ ] Thebes Labyrinth City (`lib/screens/locations/thebes_screen.dart`)
-  - [ ] Maze navigation with market structure lessons
-  - [ ] Minotaur encounter (monopoly theme)
-  - [ ] Beast hunting side quests
-- [ ] Corinth Trade Port (`lib/screens/locations/corinth_screen.dart`)
-  - [ ] Sea voyage preparation
-  - [ ] International trade mechanics
-  - [ ] Poseidon's challenges
-- [ ] Mount Olympus Endgame (`lib/screens/locations/olympus_screen.dart`)
-  - [ ] Final trials with gods
-  - [ ] Zeus debate on wealth distribution
-  - [ ] Hades underworld economics
+### 🗺️ **2D Map & Movement System** (NEW PRIORITY)
+- [ ] Create 2D top-down map system (`lib/screens/exploration_map_screen.dart`)
+  - [ ] Player avatar sprite with 4-directional movement
+  - [ ] Arrow key controls (desktop) and touch/swipe controls (mobile)
+  - [ ] Collision detection with buildings and boundaries
+  - [ ] Camera system that follows player
+  - [ ] Smooth movement animations
+- [ ] Build Athens city map (`assets/maps/athens_map.json`)
+  - [ ] Illustrated 2D backgrounds (Wrath of Gods style)
+  - [ ] Buildings: Market, Harbor, Homes, Academy, Temple
+  - [ ] Entrance triggers for each building
+  - [ ] NPCs positioned in specific locations
+  - [ ] Hidden paths and discoverable areas
+- [ ] World map system for traveling between cities
+  - [ ] Overworld map showing 6 cities (Athens, Thebes, Corinth, Sparta, Delphi, Marathon)
+  - [ ] Travel routes connecting cities
+  - [ ] Transition from city exploration to world map
 
-### Dialogue System
-- [ ] Core dialogue engine (`lib/services/dialogue_service.dart`)
-  - [ ] Branching conversation trees
-  - [ ] Choice consequences tracking
-  - [ ] Educational content integration
-- [ ] NPC system (`lib/models/npc.dart`)
-  - [ ] Character personalities and motivations
-  - [ ] Reputation-based dialogue changes
-  - [ ] God and mythological figure interactions
-- [ ] Dialogue UI components (`lib/widgets/dialogue/`)
-  - [ ] Scrolling conversation display
-  - [ ] Choice button styling
-  - [ ] Character portrait system
+### 🎯 **Player & Character System**
+- [x] Player model with stats (health, energy, reputation)
+- [ ] Starting conditions: Poor player with minimal drachmae
+  - [ ] Begin with ~10-20 drachmae
+  - [ ] Basic clothing, no equipment
+  - [ ] Must earn money through initial fetch quests
+- [ ] Character progression system
+  - [ ] Level up through completing missions
+  - [ ] Skill trees: Trading, Combat Puzzles, Exploration
+  - [ ] Experience points from quest completion
 
-### Mini-Games Development
-- [ ] Hunting Mini-Game (`lib/screens/mini_games/hunting_game.dart`)
-  - [ ] Archery mechanics with tap timing
-  - [ ] Animal scarcity based on overhunting
-  - [ ] Resource sustainability lessons
-- [ ] Trading Mini-Game (`lib/screens/mini_games/trading_game.dart`)
-  - [ ] Haggling interface with price negotiation
-  - [ ] Market equilibrium demonstration
-  - [ ] Bargaining skill progression
-- [ ] Farming Simulation (`lib/screens/mini_games/farming_game.dart`)
-  - [ ] Planting and harvesting mechanics
-  - [ ] Production cost calculations
-  - [ ] Seasonal weather effects
+### 💰 **Economy & Trading Core Systems**
+- [ ] Enhanced Market System (`lib/providers/market_provider.dart`)
+  - [ ] Dynamic pricing per city (supply/demand simulation)
+  - [ ] Price differences enable arbitrage opportunities
+  - [ ] Buy low in one city, sell high in another
+  - [ ] Market events affect prices (festivals, shortages, wars)
+  - [ ] Limited inventory space forces strategic decisions
+- [ ] International Trade Port System (`lib/screens/port_screen.dart`)
+  - [ ] Menu-based "send expedition and wait" system
+  - [ ] Select destination (Egypt, Phoenicia, Troy, etc.)
+  - [ ] Choose cargo to trade
+  - [ ] Wait time (can do other activities while waiting)
+  - [ ] Return with profit or loss based on events
+  - [ ] Random events during voyage (pirates, storms, good winds)
+- [ ] Shop System (`lib/screens/shop_screen.dart`)
+  - [ ] Equipment shop: Better armor, weapons for puzzle-combat
+  - [ ] Ship upgrades: Faster ships, larger cargo holds
+  - [ ] Information broker: Buy tips about profitable trade routes
+  - [ ] Consumables: Food, potions, tools for puzzles
 
-### Quest System Implementation
-- [ ] Main Quest Line (`lib/data/quests/main_quests.dart`)
-  - [ ] Prologue: The Curse Awakens
-  - [ ] Journey to Sparta with supply management
-  - [ ] Oracle's Wisdom riddle challenges
-  - [ ] Labyrinth of Wealth navigation
-  - [ ] Seas of Commerce trading
-  - [ ] Ascent to Olympus final trials
-- [ ] Side Quest Content (`lib/data/quests/side_quests.dart`)
-  - [ ] Hunt the Nemean Lion (sustainability)
-  - [ ] Trade with the Cyclops (negotiation)
-  - [ ] Aid the Muses (labor markets)
-  - [ ] Escape Cerberus' Monopoly (antitrust)
-  - [ ] 10+ additional economics-themed quests
-- [ ] Quest Management System
-  - [ ] Progress tracking and updates
-  - [ ] Objective completion detection
-  - [ ] Reward distribution
+### 🎲 **Combat & Puzzle System** (NEW CORE FEATURE)
+- [ ] Economic puzzle encounters (`lib/screens/puzzles/`)
+  - [ ] Resource allocation puzzles (distribute supplies optimally)
+  - [ ] Supply chain optimization challenges
+  - [ ] Trade route planning puzzles
+  - [ ] Market prediction riddles
+  - [ ] Negotiation scenarios (dialogue-based)
+- [ ] Puzzle-based combat system
+  - [ ] Turn-based encounters with economic strategy
+  - [ ] Manage resources during battle (supplies, stamina, money)
+  - [ ] Solve puzzles to weaken enemies
+  - [ ] Bribe, negotiate, or outsmart opponents
+- [ ] Combat puzzles frequency: Common
+  - [ ] Random encounters while exploring
+  - [ ] Scripted encounters in missions
+  - [ ] Optional challenge areas for rewards
 
-### Educational Content Integration
-- [ ] Economics Lessons Database (`lib/data/economics_lessons.dart`)
-  - [ ] Concept explanations with mythological ties
-  - [ ] Interactive examples and scenarios
-  - [ ] Progressive difficulty scaling
-- [ ] Mythical Lesson Tooltips
-  - [ ] Context-sensitive help system
-  - [ ] Optional deep-dive information
-  - [ ] Visual aids and diagrams
-- [ ] Assessment and Progress Tracking
-  - [ ] Knowledge check quizzes
-  - [ ] Concept mastery indicators
-  - [ ] Learning analytics
+### 📱 **Core UI & Navigation**
+- [ ] HUD overlay for exploration mode
+  - [ ] Mini health/energy bars
+  - [ ] Current drachmae display
+  - [ ] Active quest tracker
+  - [ ] Mini-map in corner
+- [ ] Inventory screen with grid layout
+  - [ ] Limited slots (upgradeable)
+  - [ ] Item sorting and filtering
+  - [ ] Equipment comparison
+- [ ] Pause menu with save/load
+- [ ] Dialogue system UI with character portraits
 
-### Random Events System
-- [ ] Event Engine (`lib/services/random_events_service.dart`)
-  - [ ] 50+ unique events with economic themes
-  - [ ] Probability weighting based on location/season
-  - [ ] Consequence calculation system
-- [ ] Natural Disasters
-  - [ ] Earthquakes affecting supply chains
-  - [ ] Storms disrupting travel and trade
-  - [ ] Droughts impacting agricultural markets
-- [ ] Economic Events
-  - [ ] Festival market booms
-  - [ ] Plague trade disruptions
-  - [ ] Political upheavals
-  - [ ] Divine interventions
+### 💾 **Data Persistence**
+- [x] Save/load system basics
+- [ ] Auto-save on major events (mission complete, city entry, purchase)
+- [ ] Manual save option from pause menu
+- [ ] Save current position on 2D map
 
-**Phase 2 Deliverable:** Alpha build with complete main story, all locations, mini-games, and core educational content
+### ✅ **Phase 1 Deliverable**
+Playable demo where you can:
+- Walk around Athens in 2D
+- Talk to 3-5 NPCs
+- Accept 1-2 starter missions
+- Complete simple puzzle encounters
+- Trade in Athens market
+- Save/load game
 
 ---
 
-## Phase 3: Polish and Testing (Months 5-6)
-*Goal: Beta build ready for app store submission*
+## Phase 2: Quest System & World Expansion (Months 3-4)
+*Goal: Full 6-city world with main questline and side missions*
 
-### Art Asset Integration
-- [ ] 2D Art Implementation
-  - [ ] Character sprites and portraits
-  - [ ] Location background illustrations
-  - [ ] Item and inventory icons
-  - [ ] UI elements with Greek pottery styling
-- [ ] Animation System
-  - [ ] Character movement and interactions
-  - [ ] Screen transitions and effects
-  - [ ] Mini-game animations
-  - [ ] Dialogue and text animations
-- [ ] Asset Optimization
-  - [ ] Image compression and formats
-  - [ ] Asset bundling for efficient loading
-  - [ ] Memory usage optimization
+### 🏛️ **Six Cities Implementation**
+Each city has unique 2D explorable map with illustrated backgrounds:
 
-### Audio Implementation
-- [ ] Music Integration (`assets/audio/music/`)
-  - [ ] Background ambient tracks
-  - [ ] Greek lyre compositions
-  - [ ] Location-specific themes
-  - [ ] Dynamic volume mixing
-- [ ] Sound Effects (`assets/audio/sfx/`)
-  - [ ] UI interaction sounds
-  - [ ] Mythological creature effects
-  - [ ] Environmental audio
-  - [ ] Mini-game feedback sounds
-- [ ] Voice Acting (Optional)
-  - [ ] Key dialogue narration
-  - [ ] God character voices
-  - [ ] Educational content narration
+- [ ] **Athens** - Starting Hub
+  - [ ] 8-10 NPCs offering missions
+  - [ ] Main market with diverse goods
+  - [ ] Harbor for international trade
+  - [ ] Academy for learning economic concepts (optional)
+  - [ ] 5+ side quests
 
-### Advanced Features
-- [ ] Reputation System
-  - [ ] God relationship tracking
-  - [ ] City-state standing effects
-  - [ ] Reputation-based content unlocks
-- [ ] Character Classes Balance
-  - [ ] Merchant bonuses and trading skills
-  - [ ] Scholar puzzle advantages
-  - [ ] Warrior survival benefits
-- [ ] Seasonal Mechanics
-  - [ ] Economic challenges by season
-  - [ ] Agriculture and harvest cycles
-  - [ ] Weather-based random events
-- [ ] Achievement System
-  - [ ] 30+ economics-themed achievements
-  - [ ] Progress tracking and notifications
-  - [ ] Reward distribution
-- [ ] New Game+ Mode
-  - [ ] Skill retention mechanics
-  - [ ] Advanced scenario difficulties
-  - [ ] Master-level content unlocks
+- [ ] **Thebes** - Military City
+  - [ ] War-themed economy (weapons, armor expensive)
+  - [ ] Resource allocation puzzle missions
+  - [ ] Training grounds mini-area
+  - [ ] Labyrinth entrance (puzzle dungeon)
 
-### Performance Optimization
-- [ ] Memory Management
-  - [ ] Widget rebuilding optimization
-  - [ ] Asset caching strategies
-  - [ ] Garbage collection tuning
-- [ ] Battery and CPU Optimization
-  - [ ] Frame rate targeting (60fps)
-  - [ ] Background processing limits
-  - [ ] Efficient state updates
-- [ ] Loading Time Improvements
-  - [ ] Lazy loading for large content
-  - [ ] Asset preloading strategies
-  - [ ] Splash screen optimization
+- [ ] **Corinth** - Trading Hub
+  - [ ] Best prices for international goods
+  - [ ] Multiple ship upgrade shops
+  - [ ] Information broker NPCs
+  - [ ] Merchant guild missions
 
-### Testing and Quality Assurance
-- [ ] Unit Testing (`test/`)
-  - [ ] Model and data structure tests
-  - [ ] Business logic validation
-  - [ ] State management testing
-- [ ] Widget Testing (`test/`)
-  - [ ] UI component functionality
-  - [ ] User interaction flows
-  - [ ] Screen navigation testing
-- [ ] Integration Testing (`integration_test/`)
-  - [ ] End-to-end game flow
-  - [ ] Save/load functionality
-  - [ ] Cross-screen data persistence
-- [ ] Device Testing
-  - [ ] Multiple screen sizes and resolutions
-  - [ ] iOS and Android compatibility
-  - [ ] Performance on minimum spec devices
-  - [ ] Battery usage validation
+- [ ] **Sparta** - Warrior Culture
+  - [ ] Opportunity cost missions (choose military vs. trade)
+  - [ ] Combat puzzle arena
+  - [ ] Spartan council quests
+  - [ ] Unique weapon shops
 
-### Educational Effectiveness Validation
-- [ ] Curriculum Review
-  - [ ] Economics concept accuracy
-  - [ ] Age-appropriate content
-  - [ ] Learning objective alignment
-- [ ] User Experience Testing
-  - [ ] Target audience playtesting (ages 12+)
-  - [ ] Accessibility validation
-  - [ ] Learning curve assessment
-- [ ] Teacher/Educator Feedback
-  - [ ] Educational consultant review
-  - [ ] Classroom integration feasibility
-  - [ ] Assessment and progress tracking
+- [ ] **Delphi** - Sacred Oracle Site
+  - [ ] Prophecy system (hints about profitable trades)
+  - [ ] Religious festivals affecting economy
+  - [ ] Riddle-based quests from Oracle
+  - [ ] Mystery investigation missions
 
-### App Store Preparation
-- [ ] Store Assets Creation
-  - [ ] App icons (multiple sizes)
-  - [ ] Screenshots for all devices
-  - [ ] App description and keywords
-  - [ ] Privacy policy and terms
-- [ ] Platform-Specific Requirements
-  - [ ] iOS App Store guidelines compliance
-  - [ ] Google Play Store requirements
-  - [ ] Age rating and content classification
-- [ ] Monetization Implementation
-  - [ ] In-app purchase setup
-  - [ ] Ad integration (for hint system)
-  - [ ] Purchase validation and security
+- [ ] **Marathon** - Historic Battlefield
+  - [ ] Memorials and historic sites
+  - [ ] Veteran NPCs with war stories
+  - [ ] Supply line management missions
+  - [ ] Scarcity-themed economic lessons
 
-### Bug Fixing and Polish
-- [ ] Critical Bug Resolution
-  - [ ] Game-breaking issues
-  - [ ] Data loss prevention
-  - [ ] Crash and stability fixes
-- [ ] UX/UI Polish
-  - [ ] Visual consistency across screens
-  - [ ] Intuitive navigation flows
-  - [ ] Accessibility improvements
-- [ ] Final Content Review
-  - [ ] Text proofreading and editing
-  - [ ] Educational content accuracy
-  - [ ] Mythological fact-checking
+### 📜 **Main Quest Line** (Linear Story with Side Quests Available)
+- [ ] **Act 1: The Economic Crisis** (Athens)
+  - [ ] Prologue: Player arrives in Athens poor and desperate
+  - [ ] Learn about mysterious trade disruptions
+  - [ ] First puzzle: Solve Athens market shortage
+  - [ ] Meet mentor NPC who explains the greater threat
+  - [ ] Objective: Earn 100 drachmae to fund journey
 
-**Phase 3 Deliverable:** Production-ready beta build submitted to app stores
+- [ ] **Act 2: The Investigation** (Thebes, Corinth)
+  - [ ] Travel to Thebes to investigate rumors
+  - [ ] Navigate Labyrinth with economic puzzles
+  - [ ] Discover monopolistic conspiracy
+  - [ ] Corinth: Track down merchant conspiracy members
+  - [ ] Major puzzle: Expose the price-fixing cartel
 
----
+- [ ] **Act 3: Building Power** (Sparta, Delphi)
+  - [ ] Gain Spartan alliance through resource quest
+  - [ ] Consult Delphi Oracle for divine guidance
+  - [ ] Complex multi-step trade mission
+  - [ ] Unlock advanced trading routes
+  - [ ] Build reputation to challenge the conspiracy
 
-## Post-Launch (Month 7+)
+- [ ] **Act 4: The Final Confrontation** (Marathon, Athens)
+  - [ ] Marathon: Gather allies and resources
+  - [ ] Return to Athens for final economic showdown
+  - [ ] Master puzzle: Restore market equilibrium
+  - [ ] Boss "battle": Debate with conspiracy leader (dialogue puzzle)
+  - [ ] Resolution: Become hero of Greek economy
 
-### Launch Support
-- [ ] App store submission and approval
-- [ ] Launch marketing and promotion
-- [ ] Community feedback monitoring
-- [ ] Bug reports and hotfixes
+### 🎯 **Side Quest System** (Discovered by Exploration)
+- [ ] NPC-driven side quests (20+ total)
+  - [ ] Hunt the Nemean Lion (sustainability economics)
+  - [ ] Trade with the Cyclops (negotiation & risk)
+  - [ ] Aid the Muses (labor market concepts)
+  - [ ] Merchant's Lost Cargo (opportunity cost)
+  - [ ] The Counterfeiter (money & trust)
+  - [ ] Festival Preparation (supply/demand surge)
+  - [ ] Fisherman's Dilemma (tragedy of the commons)
+  - [ ] Olympic Games Trading (event-based markets)
 
-### Future Content Updates
-- [ ] Additional locations and quests
-- [ ] New economic concepts and lessons
-- [ ] Seasonal events and challenges
-- [ ] Advanced difficulty modes
+- [ ] Multi-step mission structure:
+  1. Discovery: Talk to NPC, learn problem
+  2. Investigation: Gather information from other NPCs/locations
+  3. Resource Collection: Find/buy specific items
+  4. Puzzle/Challenge: Solve economic puzzle or combat encounter
+  5. Delivery/Resolution: Return to NPC, make final choice
+  6. Reward: Drachmae, items, reputation, unlocks
 
----
+### 🧩 **Advanced Puzzle & Challenge Content**
+- [ ] 30+ unique economic puzzles
+  - [ ] Supply chain optimization
+  - [ ] Trade route calculations
+  - [ ] Resource allocation under constraints
+  - [ ] Market prediction challenges
+  - [ ] Negotiation dialogue trees
+  - [ ] Barter and exchange puzzles
 
-## Progress Tracking
+- [ ] Puzzle difficulty scaling
+  - [ ] Tutorial puzzles in Athens (easy)
+  - [ ] Intermediate in Thebes/Corinth
+  - [ ] Advanced in Sparta/Delphi
+  - [ ] Master level in endgame
 
-**Phase 1 Progress:** 0% (0/X tasks completed)
-**Phase 2 Progress:** 0% (0/Y tasks completed)
-**Phase 3 Progress:** 0% (0/Z tasks completed)
+### 🔄 **Reputation & Relationship System**
+- [ ] City reputation tracking (6 cities)
+  - [ ] Affects shop prices (discounts at high rep)
+  - [ ] Unlocks special missions
+  - [ ] Changes NPC dialogue
+  - [ ] Required minimums for story progression
 
-**Overall Progress:** 0% (0/Total tasks completed)
+- [ ] NPC memory system
+  - [ ] Remember past conversations
+  - [ ] Reference previous quest outcomes
+  - [ ] React to player reputation
+  - [ ] Unique dialogue for repeat visits
+
+### 🌍 **Random Events & Encounters**
+- [ ] While exploring cities (10% chance per area)
+  - [ ] Street merchants with deals
+  - [ ] Pickpockets (lose small amount)
+  - [ ] Helpful citizens (gain info)
+  - [ ] Mystery encounters (hidden quests)
+
+- [ ] While traveling between cities
+  - [ ] Bandits (puzzle-combat)
+  - [ ] Fellow travelers (trade opportunities)
+  - [ ] Natural obstacles (pay to bypass or solve puzzle)
+  - [ ] Divine interventions (god NPCs)
+
+### 📚 **Educational Content Integration**
+- [ ] Learning through missions (primary method)
+  - [ ] Supply & Demand: Market shortage quests
+  - [ ] Opportunity Cost: Choice-based missions
+  - [ ] Comparative Advantage: International trade
+  - [ ] Market Equilibrium: Price-fixing exposure quest
+  - [ ] Scarcity: Resource management puzzles
+
+- [ ] Explicit teaching moments (optional)
+  - [ ] NPCs explain concepts when asked
+  - [ ] Academy lectures (can attend for bonuses)
+  - [ ] In-game encyclopedia (unlocks as you learn)
+  - [ ] Mentor character provides economic insights
+
+### ✅ **Phase 2 Deliverable**
+Complete game with:
+- 6 fully explorable cities
+- Main story questline (4 acts)
+- 20+ side quests
+- 30+ puzzles and challenges
+- Full trading economy system
+- International trade expeditions
+- Reputation system
 
 ---
 
-## Notes and Decisions
+## Phase 3: Art, Audio & Content Polish (Months 5-6)
+*Goal: Beautiful illustrated game with polished experience*
 
-*Use this section to track important decisions, changes to the plan, or lessons learned during development.*
+### 🎨 **Illustrated 2D Art Assets** (Wrath of Gods Style)
+- [ ] Character art
+  - [ ] Player character sprites (4 directions × 3 animation frames)
+  - [ ] 30+ NPC character portraits for dialogue
+  - [ ] Enemy/challenger illustrations for puzzles
 
-**Date** | **Note**
----------|----------
-[Date] | Project started - initialized with comprehensive development plan
+- [ ] Environment art (illustrated backgrounds)
+  - [ ] 6 city maps (Athens, Thebes, Corinth, Sparta, Delphi, Marathon)
+  - [ ] Interior scenes (shops, homes, temples, harbors)
+  - [ ] World map illustration with roads and landmarks
+  - [ ] Special locations (Labyrinth, Oracle chamber, etc.)
+
+- [ ] UI art
+  - [ ] Greek pottery-inspired borders and frames
+  - [ ] Custom buttons with ancient Greek motifs
+  - [ ] Inventory item icons (50+ items)
+  - [ ] Resource icons (drachmae, food, materials)
+  - [ ] Dialogue box with character portrait frames
+
+- [ ] Animation & effects
+  - [ ] Character walking animations
+  - [ ] Door opening/closing transitions
+  - [ ] Market activity background animations
+  - [ ] Weather effects (rain, sun, wind)
+  - [ ] Particle effects for special events
+
+### 🎵 **Audio Implementation**
+- [ ] Music tracks
+  - [ ] Main theme (menu screen)
+  - [ ] Athens ambient music (lively marketplace)
+  - [ ] Exploration music (adventure theme)
+  - [ ] Tension music (important quests)
+  - [ ] Combat puzzle music (strategic)
+  - [ ] Victory/success jingles
+  - [ ] Each city has unique musical flavor
+
+- [ ] Sound effects
+  - [ ] Footsteps on different surfaces
+  - [ ] Door opens/closes
+  - [ ] Coin sounds (buying/selling)
+  - [ ] UI clicks and hovers
+  - [ ] Puzzle success/failure sounds
+  - [ ] Ambient city sounds (crowds, animals, workshops)
+  - [ ] Ship sounds at harbor
+
+### 🎁 **Advanced Features & Polish**
+- [ ] Quest journal & tracker
+  - [ ] Active quest list with objectives
+  - [ ] Completed quest archive
+  - [ ] Hints and clues page
+  - [ ] Map markers for quest locations
+
+- [ ] Achievement system
+  - [ ] Complete first trade (Bronze Merchant)
+  - [ ] Earn 1000 drachmae (Silver Baron)
+  - [ ] Complete all side quests (Master of Economics)
+  - [ ] Max reputation in all cities (Beloved Hero)
+  - [ ] Solve all puzzles without hints (Scholar Supreme)
+  - [ ] 30+ total achievements
+
+- [ ] Dynamic difficulty
+  - [ ] Puzzle difficulty adjusts to player performance
+  - [ ] Optional hints for stuck players (costs drachmae)
+  - [ ] Easy mode: More starting money, easier puzzles
+  - [ ] Hard mode: Less money, complex puzzles, permadeath
+
+- [ ] Accessibility features
+  - [ ] Text size options
+  - [ ] Colorblind modes
+  - [ ] Control remapping
+  - [ ] Screen reader support (basic)
+
+### 🚀 **Performance & Optimization**
+- [ ] Frame rate optimization (target 60fps)
+- [ ] Asset loading optimization
+  - [ ] Lazy load city maps (only load current area)
+  - [ ] Compress images without quality loss
+  - [ ] Audio streaming for music
+- [ ] Memory management
+  - [ ] Dispose unused assets
+  - [ ] Efficient state management
+  - [ ] Minimal widget rebuilds
+- [ ] Battery optimization
+  - [ ] Reduce background processing
+  - [ ] Efficient rendering
+
+### ✅ **Phase 3 Deliverable**
+Polished game with:
+- Beautiful illustrated art style
+- Full soundtrack and SFX
+- Achievement system
+- Quest journal
+- Optimized performance
+
+---
+
+## Phase 4: Testing & App Store Launch (Months 7-8)
+*Goal: Bug-free, store-ready game*
+
+### 🧪 **Testing & Quality Assurance**
+- [ ] Comprehensive testing
+  - [ ] Every quest completable
+  - [ ] Every puzzle solvable
+  - [ ] All NPCs functional
+  - [ ] Trading economy balanced
+  - [ ] Save/load works perfectly
+
+- [ ] Platform testing
+  - [ ] iOS devices (iPhone 8+ / iPad)
+  - [ ] Android devices (API 23+)
+  - [ ] Multiple screen sizes
+  - [ ] Performance on older devices
+
+- [ ] Playtesting with target audience
+  - [ ] Ages 12+ students
+  - [ ] Collect feedback on fun factor
+  - [ ] Validate educational effectiveness
+  - [ ] Adjust difficulty based on feedback
+
+- [ ] Bug fixing
+  - [ ] Critical: Game crashes, save corruption
+  - [ ] Major: Quest blockers, economy exploits
+  - [ ] Minor: Visual glitches, text errors
+  - [ ] Polish: UI improvements, balance tweaks
+
+### 📱 **App Store Preparation**
+- [ ] Store assets
+  - [ ] App icon (1024×1024 + all sizes)
+  - [ ] Screenshots (5-8 per platform)
+  - [ ] Preview video (15-30 seconds)
+  - [ ] App description (compelling + keywords)
+  - [ ] Privacy policy & terms of service
+
+- [ ] iOS App Store
+  - [ ] Apple Developer account
+  - [ ] App Store Connect setup
+  - [ ] Compliance review
+  - [ ] Age rating (12+)
+  - [ ] Submit for review
+
+- [ ] Google Play Store
+  - [ ] Google Play Console setup
+  - [ ] Content rating questionnaire
+  - [ ] Store listing optimization
+  - [ ] Submit for review
+
+### 🎓 **Educational Validation**
+- [ ] Economics accuracy review
+  - [ ] Consult economics educator
+  - [ ] Verify all concepts are accurate
+  - [ ] Ensure age-appropriate complexity
+
+- [ ] Learning outcomes documentation
+  - [ ] List of economic concepts taught
+  - [ ] Mapping of quests to learning objectives
+  - [ ] Teacher's guide (optional bonus)
+
+### ✅ **Phase 4 Deliverable**
+Published app on iOS and Android app stores!
+
+---
+
+## Post-Launch (Month 9+)
+
+### 📈 **Launch & Marketing**
+- [ ] Soft launch in select markets
+- [ ] Gather user reviews and feedback
+- [ ] Monitor analytics (playtime, completion rates)
+- [ ] Social media presence
+- [ ] Educational community outreach
+
+### 🔄 **Updates & Expansions** (Future Content)
+- [ ] **Update 1: New Islands** (Month 10)
+  - [ ] Crete, Rhodes, Cyprus explorable
+  - [ ] 10 new quests
+  - [ ] New trade goods and routes
+
+- [ ] **Update 2: Multiplayer Trading** (Month 12)
+  - [ ] Asynchronous trade with other players
+  - [ ] Leaderboards for richest merchants
+  - [ ] Cooperative quests
+
+- [ ] **Update 3: Advanced Economics** (Month 14)
+  - [ ] Banking system (loans, interest)
+  - [ ] Business creation (own shops)
+  - [ ] Stock market equivalent
+
+### 🐛 **Ongoing Support**
+- [ ] Bug fixes and hotfixes
+- [ ] Balance adjustments
+- [ ] Community feature requests
+- [ ] Performance improvements
+
+---
+
+## 📊 Progress Tracking
+
+**Phase 1 Progress:** 15% (Basic systems exist, need 2D exploration)
+**Phase 2 Progress:** 0% (Quest system exists but needs expansion)
+**Phase 3 Progress:** 0% (Art and audio needed)
+**Phase 4 Progress:** 0% (Testing and launch)
+
+**Overall Progress:** ~10% (Core systems built, major features needed)
+
+---
+
+## 🎯 Key Success Metrics
+
+- [ ] **Engagement:** Average 2+ hours playtime
+- [ ] **Education:** 80%+ players can explain 3+ economic concepts
+- [ ] **Completion:** 60%+ players finish main story
+- [ ] **Retention:** 50%+ return after first session
+- [ ] **Rating:** 4.0+ stars on app stores
+
+---
+
+## 📝 Design Notes & Decisions
+
+**Date** | **Decision** | **Rationale**
+---------|-------------|-------------
+2025-10 | Shift to 2D exploration (Wrath of Gods style) | More immersive, better game feel than menu-based navigation
+2025-10 | Player starts poor | Creates motivation to engage with economy; learn by necessity
+2025-10 | Puzzle-based combat (common) | Teaches economic thinking through frequent challenges
+2025-10 | Menu-based port trade | Simpler to implement, lets player multitask while waiting
+2025-10 | 6 cities to start | Manageable scope, can expand post-launch
+2025-10 | Illustrated 2D art style | Matches Wrath of Gods aesthetic, timeless visual appeal
+2025-10 | Linear main story with side quests | Clear progression for learners, freedom for explorers
+2025-10 | NPCs stay in place but remember you | Easier to find, still feels personal and reactive
+
+---
+
+## 🚀 Next Immediate Steps
+
+1. **Build 2D exploration system** - Top priority for new game feel
+2. **Create Athens city map** - First playable area
+3. **Implement player movement & collision** - Core gameplay mechanic
+4. **Design 5 starter puzzles** - Test educational + fun balance
+5. **Create port trade menu system** - Primary money-earning mechanic
+6. **Write first 3 main quests** - Beginning of story
+
+*This development plan transforms Odyssey of Olympus into an engaging exploration-based economics adventure, inspired by classics like Wrath of the Gods while maintaining strong educational value.*

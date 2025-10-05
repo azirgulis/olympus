@@ -37,6 +37,18 @@ _$PlayerImpl _$$PlayerImplFromJson(Map<String, dynamic> json) => _$PlayerImpl(
             (k, e) => MapEntry(k, e as bool),
           ) ??
           const {},
+      inventory: (json['inventory'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, (e as num).toInt()),
+          ) ??
+          const {},
+      equippedItems: (json['equippedItems'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, e as String),
+          ) ??
+          const {},
+      unlockedAchievements: (json['unlockedAchievements'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$PlayerImplToJson(_$PlayerImpl instance) =>
@@ -54,6 +66,9 @@ Map<String, dynamic> _$$PlayerImplToJson(_$PlayerImpl instance) =>
       'completedQuests': instance.completedQuests,
       'activeQuests': instance.activeQuests,
       'storyFlags': instance.storyFlags,
+      'inventory': instance.inventory,
+      'equippedItems': instance.equippedItems,
+      'unlockedAchievements': instance.unlockedAchievements,
     };
 
 const _$CharacterClassEnumMap = {

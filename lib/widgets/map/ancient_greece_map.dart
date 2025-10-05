@@ -4,11 +4,31 @@ import '../../data/map/locations.dart';
 import '../../data/map/travel_routes.dart';
 import 'animated_traveler.dart';
 
+const Map<String, Offset> kAncientGreeceLocationAnchors = {
+  'athens': Offset(0.58, 0.52),
+  'sparta': Offset(0.55, 0.75),
+  'corinth': Offset(0.52, 0.60),
+  'delphi': Offset(0.48, 0.45),
+  'olympia': Offset(0.42, 0.68),
+  'thebes': Offset(0.55, 0.48),
+  'marathon': Offset(0.65, 0.52),
+  'aegina': Offset(0.58, 0.60),
+  'rhodes': Offset(0.85, 0.88),
+  'crete': Offset(0.65, 0.95),
+};
+
+Offset? ancientGreeceLocationOffset(String locationId) {
+  return kAncientGreeceLocationAnchors[locationId];
+}
+
 class AncientGreeceMap extends StatefulWidget {
   final List<GameLocation> unlockedLocations;
   final String currentLocationId;
   final Function(GameLocation) onLocationTapped;
   final PlayerJourney? currentJourney;
+  final Offset? travelerPositionOverride;
+  final Offset? travelerStartOverride;
+  final Offset? travelerDestinationOverride;
 
   const AncientGreeceMap({
     super.key,
@@ -16,6 +36,9 @@ class AncientGreeceMap extends StatefulWidget {
     required this.currentLocationId,
     required this.onLocationTapped,
     this.currentJourney,
+    this.travelerPositionOverride,
+    this.travelerStartOverride,
+    this.travelerDestinationOverride,
   });
 
   @override
@@ -51,6 +74,9 @@ class _AncientGreeceMapState extends State<AncientGreeceMap> {
               unlockedLocations: widget.unlockedLocations,
               currentLocationId: widget.currentLocationId,
               onLocationTapped: widget.onLocationTapped,
+              travelerPositionOverride: widget.travelerPositionOverride,
+              travelerStartOverride: widget.travelerStartOverride,
+              travelerDestinationOverride: widget.travelerDestinationOverride,
             ),
           ),
           // Animated traveler during journey
@@ -72,16 +98,7 @@ class _AncientGreeceMapState extends State<AncientGreeceMap> {
   Map<String, Offset> _getLocationPositions() {
     // Coordinates adjusted for cropped/zoomed map to match real geography
     // Based on actual geographic positions in ancient Greece
-    return {
-      'athens': const Offset(0.65, 0.45), // Central-east Attica
-      'sparta': const Offset(0.55, 0.85), // Southern Peloponnese
-      'corinth': const Offset(0.45, 0.55), // Isthmus of Corinth
-      'delphi': const Offset(0.35, 0.35), // Central Greece, north-west of Athens
-      'olympia': const Offset(0.25, 0.70), // Western Peloponnese
-      'thebes': const Offset(0.55, 0.35), // Boeotia, north-west of Athens
-      'marathon': const Offset(0.75, 0.40), // North-east coast of Attica
-      'aegina': const Offset(0.60, 0.55), // Island in Saronic Gulf
-    };
+    return kAncientGreeceLocationAnchors;
   }
 }
 
@@ -89,11 +106,17 @@ class AncientGreeceMapPainter extends CustomPainter {
   final List<GameLocation> unlockedLocations;
   final String currentLocationId;
   final Function(GameLocation) onLocationTapped;
+  final Offset? travelerPositionOverride;
+  final Offset? travelerStartOverride;
+  final Offset? travelerDestinationOverride;
 
   AncientGreeceMapPainter({
     required this.unlockedLocations,
     required this.currentLocationId,
     required this.onLocationTapped,
+    this.travelerPositionOverride,
+    this.travelerStartOverride,
+    this.travelerDestinationOverride,
   });
 
   @override
@@ -104,36 +127,28 @@ class AncientGreeceMapPainter extends CustomPainter {
     // Draw location markers
     _drawLocations(canvas, size);
 
+    // Draw quick travel line if active
+    _drawQuickTravelPath(canvas, size);
+
     // Draw current location character (on top)
     _drawCurrentLocationCharacter(canvas, size);
   }
-
 
   void _drawLocations(Canvas canvas, Size size) {
     final width = size.width;
     final height = size.height;
 
-    // Define positions for cropped/zoomed map to match real geography
-    final locationPositions = {
-      'athens': Offset(width * 0.65, height * 0.45), // Central-east Attica
-      'sparta': Offset(width * 0.55, height * 0.85), // Southern Peloponnese
-      'corinth': Offset(width * 0.45, height * 0.55), // Isthmus of Corinth
-      'delphi': Offset(width * 0.35, height * 0.35), // Central Greece, north-west of Athens
-      'olympia': Offset(width * 0.25, height * 0.70), // Western Peloponnese
-      'thebes': Offset(width * 0.55, height * 0.35), // Boeotia, north-west of Athens
-      'marathon': Offset(width * 0.75, height * 0.40), // North-east coast of Attica
-      'aegina': Offset(width * 0.60, height * 0.55), // Island in Saronic Gulf
-    };
-
     for (final location in LocationsData.getAllLocations()) {
-      final position = locationPositions[location.id];
-      if (position != null) {
+      final normalized = ancientGreeceLocationOffset(location.id);
+      if (normalized != null) {
+        final position = Offset(width * normalized.dx, height * normalized.dy);
         _drawLocationMarker(canvas, location, position);
       }
     }
   }
 
-  void _drawLocationMarker(Canvas canvas, GameLocation location, Offset position) {
+  void _drawLocationMarker(
+      Canvas canvas, GameLocation location, Offset position) {
     final paint = Paint()..style = PaintingStyle.fill;
     final isUnlocked = unlockedLocations.any((loc) => loc.id == location.id);
     final isCurrent = location.id == currentLocationId;
@@ -186,7 +201,8 @@ class AncientGreeceMapPainter extends CustomPainter {
     }
   }
 
-  void _drawLocationIcon(Canvas canvas, GameLocation location, Offset position, double markerSize) {
+  void _drawLocationIcon(Canvas canvas, GameLocation location, Offset position,
+      double markerSize) {
     final paint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
@@ -233,7 +249,9 @@ class AncientGreeceMapPainter extends CustomPainter {
     canvas.drawLine(
       Offset(center.dx, center.dy - size * 0.3),
       Offset(center.dx, center.dy + size * 0.3),
-      paint..strokeWidth = 2..style = PaintingStyle.stroke,
+      paint
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke,
     );
 
     // Anchor arms
@@ -248,7 +266,10 @@ class AncientGreeceMapPainter extends CustomPainter {
   void _drawTemple(Canvas canvas, Offset center, double size, Paint paint) {
     // Temple base
     canvas.drawRect(
-      Rect.fromCenter(center: Offset(center.dx, center.dy + size * 0.2), width: size * 0.8, height: size * 0.2),
+      Rect.fromCenter(
+          center: Offset(center.dx, center.dy + size * 0.2),
+          width: size * 0.8,
+          height: size * 0.2),
       paint,
     );
 
@@ -276,21 +297,29 @@ class AncientGreeceMapPainter extends CustomPainter {
   void _drawSword(Canvas canvas, Offset center, double size, Paint paint) {
     // Sword blade
     canvas.drawRect(
-      Rect.fromCenter(center: Offset(center.dx, center.dy - size * 0.1), width: size * 0.1, height: size * 0.6),
+      Rect.fromCenter(
+          center: Offset(center.dx, center.dy - size * 0.1),
+          width: size * 0.1,
+          height: size * 0.6),
       paint,
     );
 
     // Sword hilt
     canvas.drawRect(
-      Rect.fromCenter(center: Offset(center.dx, center.dy + size * 0.25), width: size * 0.3, height: size * 0.1),
+      Rect.fromCenter(
+          center: Offset(center.dx, center.dy + size * 0.25),
+          width: size * 0.3,
+          height: size * 0.1),
       paint,
     );
 
     // Sword pommel
-    canvas.drawCircle(Offset(center.dx, center.dy + size * 0.35), size * 0.08, paint);
+    canvas.drawCircle(
+        Offset(center.dx, center.dy + size * 0.35), size * 0.08, paint);
   }
 
-  void _drawLocationName(Canvas canvas, GameLocation location, Offset position, double markerSize) {
+  void _drawLocationName(Canvas canvas, GameLocation location, Offset position,
+      double markerSize) {
     final textPainter = TextPainter(
       text: TextSpan(
         text: location.name,
@@ -391,13 +420,15 @@ class AncientGreeceMapPainter extends CustomPainter {
     }
   }
 
-  void _drawDashedLine(Canvas canvas, Offset from, Offset to, Paint paint, {double dashLength = 5, double spaceLength = 3}) {
+  void _drawDashedLine(Canvas canvas, Offset from, Offset to, Paint paint,
+      {double dashLength = 5, double spaceLength = 3}) {
     final distance = (to - from).distance;
     final dashCount = (distance / (dashLength + spaceLength)).floor();
 
     for (int i = 0; i < dashCount; i++) {
       final startRatio = (i * (dashLength + spaceLength)) / distance;
-      final endRatio = ((i * (dashLength + spaceLength)) + dashLength) / distance;
+      final endRatio =
+          ((i * (dashLength + spaceLength)) + dashLength) / distance;
 
       final dashStart = Offset.lerp(from, to, startRatio)!;
       final dashEnd = Offset.lerp(from, to, endRatio)!;
@@ -410,22 +441,49 @@ class AncientGreeceMapPainter extends CustomPainter {
     final width = size.width;
     final height = size.height;
 
-    final locationPositions = {
-      'athens': Offset(width * 0.58, height * 0.52),
-      'sparta': Offset(width * 0.55, height * 0.75),
-      'corinth': Offset(width * 0.52, height * 0.60),
-      'delphi': Offset(width * 0.48, height * 0.45),
-      'olympia': Offset(width * 0.42, height * 0.68),
-      'thebes': Offset(width * 0.55, height * 0.48),
-      'marathon': Offset(width * 0.65, height * 0.52),
-      'aegina': Offset(width * 0.58, height * 0.60),
-      'rhodes': Offset(width * 0.85, height * 0.88),
-      'crete': Offset(width * 0.65, height * 0.95),
-    };
-
-    final currentPos = locationPositions[currentLocationId];
-    if (currentPos != null) {
+    final normalizedOverride = travelerPositionOverride ??
+        ancientGreeceLocationOffset(currentLocationId);
+    if (normalizedOverride != null) {
+      final currentPos = Offset(
+        width * normalizedOverride.dx,
+        height * normalizedOverride.dy,
+      );
       _drawGreekCharacter(canvas, currentPos);
+    }
+  }
+
+  void _drawQuickTravelPath(Canvas canvas, Size size) {
+    if (travelerStartOverride == null || travelerDestinationOverride == null) {
+      return;
+    }
+
+    final start = Offset(
+      size.width * travelerStartOverride!.dx,
+      size.height * travelerStartOverride!.dy,
+    );
+    final end = Offset(
+      size.width * travelerDestinationOverride!.dx,
+      size.height * travelerDestinationOverride!.dy,
+    );
+
+    final paint = Paint()
+      ..color = Colors.amberAccent
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    const dashLength = 16.0;
+    const dashGap = 8.0;
+    final totalDistance = (end - start).distance;
+    double drawn = 0;
+
+    while (drawn < totalDistance) {
+      final tStart = (drawn / totalDistance).clamp(0.0, 1.0);
+      final tEnd = ((drawn + dashLength) / totalDistance).clamp(0.0, 1.0);
+      final dashStart = Offset.lerp(start, end, tStart)!;
+      final dashEnd = Offset.lerp(start, end, tEnd)!;
+      canvas.drawLine(dashStart, dashEnd, paint);
+      drawn += dashLength + dashGap;
     }
   }
 
@@ -449,7 +507,8 @@ class AncientGreeceMapPainter extends CustomPainter {
     paint.color = Colors.blue.shade700;
     final cloakPath = Path();
     cloakPath.moveTo(characterPos.dx - 10, characterPos.dy);
-    cloakPath.quadraticBezierTo(characterPos.dx - 15, characterPos.dy + 8, characterPos.dx - 8, characterPos.dy + 15);
+    cloakPath.quadraticBezierTo(characterPos.dx - 15, characterPos.dy + 8,
+        characterPos.dx - 8, characterPos.dy + 15);
     cloakPath.lineTo(characterPos.dx - 4, characterPos.dy + 8);
     cloakPath.close();
     canvas.drawPath(cloakPath, paint);
@@ -477,8 +536,10 @@ class AncientGreeceMapPainter extends CustomPainter {
 
     // Sandals
     paint.color = Colors.brown.shade800;
-    canvas.drawCircle(Offset(characterPos.dx - 2, characterPos.dy + 29), 2, paint);
-    canvas.drawCircle(Offset(characterPos.dx + 2, characterPos.dy + 29), 2, paint);
+    canvas.drawCircle(
+        Offset(characterPos.dx - 2, characterPos.dy + 29), 2, paint);
+    canvas.drawCircle(
+        Offset(characterPos.dx + 2, characterPos.dy + 29), 2, paint);
 
     // Staff (optional - for a traveling appearance)
     paint.color = Colors.brown.shade700;

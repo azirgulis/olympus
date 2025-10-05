@@ -9,15 +9,26 @@ class CharacterSelectionScreen extends ConsumerStatefulWidget {
   const CharacterSelectionScreen({super.key});
 
   @override
-  ConsumerState<CharacterSelectionScreen> createState() => _CharacterSelectionScreenState();
+  ConsumerState<CharacterSelectionScreen> createState() =>
+      _CharacterSelectionScreenState();
 }
 
-class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScreen> {
+class _CharacterSelectionScreenState
+    extends ConsumerState<CharacterSelectionScreen> {
   final TextEditingController _nameController = TextEditingController();
   CharacterClass _selectedClass = CharacterClass.merchant;
+  bool _isNameValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_handleNameChanged);
+    _handleNameChanged();
+  }
 
   @override
   void dispose() {
+    _nameController.removeListener(_handleNameChanged);
     _nameController.dispose();
     super.dispose();
   }
@@ -76,17 +87,19 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF8B4513), width: 2),
+                    border:
+                        Border.all(color: const Color(0xFF8B4513), width: 2),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Hero Name:',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF8B4513),
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF8B4513),
+                                ),
                       ),
                       const SizedBox(height: 8),
                       TextField(
@@ -94,7 +107,8 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
                         decoration: const InputDecoration(
                           hintText: 'Enter your hero\'s name...',
                           border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                       ),
                     ],
@@ -111,12 +125,11 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
                       Text(
                         'Choose Your Path:',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                       ),
                       const SizedBox(height: 16),
-
                       Expanded(
                         child: ListView(
                           children: [
@@ -157,7 +170,7 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _nameController.text.trim().isEmpty ? null : _startJourney,
+                    onPressed: _isNameValid ? _startJourney : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: const Color(0xFF8B4513),
@@ -205,12 +218,12 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : Colors.white.withValues(alpha: 0.7),
+          color:
+              isSelected ? Colors.white : Colors.white.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFFD700) : const Color(0xFF8B4513),
+            color:
+                isSelected ? const Color(0xFFFFD700) : const Color(0xFF8B4513),
             width: isSelected ? 3 : 2,
           ),
           boxShadow: isSelected
@@ -247,9 +260,9 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
                       Text(
                         title,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF8B4513),
-                        ),
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF8B4513),
+                            ),
                       ),
                       if (isSelected) ...[
                         const SizedBox(width: 8),
@@ -264,16 +277,16 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: const Color(0xFF8B4513).withValues(alpha: 0.8),
-                    ),
+                          fontStyle: FontStyle.italic,
+                          color: const Color(0xFF8B4513).withValues(alpha: 0.8),
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: const Color(0xFF8B4513).withValues(alpha: 0.9),
-                    ),
+                          color: const Color(0xFF8B4513).withValues(alpha: 0.9),
+                        ),
                   ),
                 ],
               ),
@@ -287,14 +300,24 @@ class _CharacterSelectionScreenState extends ConsumerState<CharacterSelectionScr
   void _startJourney() {
     // Create the new player
     ref.read(playerProvider.notifier).createNewPlayer(
-      name: _nameController.text.trim(),
-      characterClass: _selectedClass,
-    );
+          name: _nameController.text.trim(),
+          characterClass: _selectedClass,
+        );
 
     // Initialize starting inventory
     ref.read(inventoryProvider.notifier).initializeStartingInventory();
 
     // Navigate to the game
     context.go('/game');
+  }
+
+  void _handleNameChanged() {
+    final trimmed = _nameController.text.trim();
+    final isValid = trimmed.isNotEmpty;
+    if (isValid != _isNameValid) {
+      setState(() {
+        _isNameValid = isValid;
+      });
+    }
   }
 }

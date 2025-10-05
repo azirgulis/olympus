@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/player.dart';
 import '../models/inventory.dart';
@@ -9,23 +10,58 @@ class StorageService {
   static const String _inventoryBoxName = 'inventory_box';
   static const String _marketBoxName = 'market_box';
 
+  static bool _isInitialized = false;
+
   static late Box<Map> _playerBox;
   static late Box<Map> _gameStateBox;
   static late Box<Map> _inventoryBox;
   static late Box<Map> _marketBox;
 
   static Future<void> initialize() async {
-    await Hive.initFlutter();
+    if (_isInitialized) {
+      return;
+    }
 
-    // Register adapters for complex types
-    Hive.registerAdapter(CharacterClassAdapter());
-    Hive.registerAdapter(ItemTypeAdapter());
-    Hive.registerAdapter(ItemRarityAdapter());
+    try {
+      await Hive.initFlutter();
 
-    _playerBox = await Hive.openBox<Map>(_playerBoxName);
-    _gameStateBox = await Hive.openBox<Map>(_gameStateBoxName);
-    _inventoryBox = await Hive.openBox<Map>(_inventoryBoxName);
-    _marketBox = await Hive.openBox<Map>(_marketBoxName);
+      // Register adapters for complex types only once
+      final characterAdapter = CharacterClassAdapter();
+      if (!Hive.isAdapterRegistered(characterAdapter.typeId)) {
+        Hive.registerAdapter(characterAdapter);
+      }
+
+      final itemTypeAdapter = ItemTypeAdapter();
+      if (!Hive.isAdapterRegistered(itemTypeAdapter.typeId)) {
+        Hive.registerAdapter(itemTypeAdapter);
+      }
+
+      final itemRarityAdapter = ItemRarityAdapter();
+      if (!Hive.isAdapterRegistered(itemRarityAdapter.typeId)) {
+        Hive.registerAdapter(itemRarityAdapter);
+      }
+
+      _playerBox = Hive.isBoxOpen(_playerBoxName)
+          ? Hive.box<Map>(_playerBoxName)
+          : await Hive.openBox<Map>(_playerBoxName);
+      _gameStateBox = Hive.isBoxOpen(_gameStateBoxName)
+          ? Hive.box<Map>(_gameStateBoxName)
+          : await Hive.openBox<Map>(_gameStateBoxName);
+      _inventoryBox = Hive.isBoxOpen(_inventoryBoxName)
+          ? Hive.box<Map>(_inventoryBoxName)
+          : await Hive.openBox<Map>(_inventoryBoxName);
+      _marketBox = Hive.isBoxOpen(_marketBoxName)
+          ? Hive.box<Map>(_marketBoxName)
+          : await Hive.openBox<Map>(_marketBoxName);
+
+      _isInitialized = true;
+    } catch (e, stackTrace) {
+      throw StorageException(
+        'Failed to initialize local storage',
+        cause: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   // Save current game state
@@ -59,11 +95,15 @@ class StorageService {
       if (marketData != null) {
         await _marketBox.put(saveSlot, marketData);
       }
-
-      print('Game saved successfully to slot: $saveSlot');
-    } catch (e) {
-      print('Error saving game: $e');
-      rethrow;
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('StorageService: failed saving "$saveSlot" -> $e');
+      }
+      throw StorageException(
+        'Unable to save game to slot "$saveSlot".',
+        cause: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -85,9 +125,11 @@ class StorageService {
       // Reconstruct game state
       final gameState = GameState(
         currentLocationId: gameStateData['currentLocationId'] ?? '',
-        unlockedLocations: Set<String>.from(gameStateData['unlockedLocations'] ?? []),
+        unlockedLocations:
+            Set<String>.from(gameStateData['unlockedLocations'] ?? []),
         storyFlags: Map<String, bool>.from(gameStateData['storyFlags'] ?? {}),
-        completedTutorials: Map<String, bool>.from(gameStateData['completedTutorials'] ?? {}),
+        completedTutorials:
+            Map<String, bool>.from(gameStateData['completedTutorials'] ?? {}),
         gameStarted: gameStateData['gameStarted'] ?? false,
       );
 
@@ -95,7 +137,8 @@ class StorageService {
       List<InventoryItem> inventory = [];
       if (inventoryData != null && inventoryData['items'] != null) {
         inventory = (inventoryData['items'] as List)
-            .map((item) => InventoryItem.fromJson(Map<String, dynamic>.from(item)))
+            .map((item) =>
+                InventoryItem.fromJson(Map<String, dynamic>.from(item)))
             .toList();
       }
 
@@ -103,12 +146,20 @@ class StorageService {
         player: player,
         gameState: gameState,
         inventory: inventory,
-        marketData: marketData != null ? Map<String, dynamic>.from(marketData) : null,
-        lastSaved: DateTime.tryParse(gameStateData['lastSaved'] ?? '') ?? DateTime.now(),
+        marketData:
+            marketData != null ? Map<String, dynamic>.from(marketData) : null,
+        lastSaved: DateTime.tryParse(gameStateData['lastSaved'] ?? '') ??
+            DateTime.now(),
       );
-    } catch (e) {
-      print('Error loading game: $e');
-      return null;
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('StorageService: failed loading "$saveSlot" -> $e');
+      }
+      throw StorageException(
+        'Unable to load game from slot "$saveSlot".',
+        cause: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -127,16 +178,22 @@ class StorageService {
       await _gameStateBox.delete(saveSlot);
       await _inventoryBox.delete(saveSlot);
       await _marketBox.delete(saveSlot);
-      print('Save slot deleted: $saveSlot');
-    } catch (e) {
-      print('Error deleting save: $e');
-      rethrow;
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('StorageService: failed deleting "$saveSlot" -> $e');
+      }
+      throw StorageException(
+        'Unable to delete save slot "$saveSlot".',
+        cause: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
   // Check if save exists
   static bool hasSave({String saveSlot = 'current'}) {
-    return _playerBox.containsKey(saveSlot) && _gameStateBox.containsKey(saveSlot);
+    return _playerBox.containsKey(saveSlot) &&
+        _gameStateBox.containsKey(saveSlot);
   }
 
   // Get save metadata (for displaying in UI)
@@ -153,7 +210,8 @@ class StorageService {
       playerName: playerData['name'] ?? 'Unknown Hero',
       characterClass: _parseCharacterClass(playerData['characterClass']),
       currentLocation: gameStateData['currentLocationId'] ?? 'Unknown',
-      lastSaved: DateTime.tryParse(gameStateData['lastSaved'] ?? '') ?? DateTime.now(),
+      lastSaved:
+          DateTime.tryParse(gameStateData['lastSaved'] ?? '') ?? DateTime.now(),
       playerLevel: _calculatePlayerLevel(playerData),
     );
   }
@@ -163,10 +221,14 @@ class StorageService {
 
     if (classData is String) {
       switch (classData) {
-        case 'merchant': return CharacterClass.merchant;
-        case 'scholar': return CharacterClass.scholar;
-        case 'warrior': return CharacterClass.warrior;
-        default: return CharacterClass.merchant;
+        case 'merchant':
+          return CharacterClass.merchant;
+        case 'scholar':
+          return CharacterClass.scholar;
+        case 'warrior':
+          return CharacterClass.warrior;
+        default:
+          return CharacterClass.merchant;
       }
     }
 
@@ -176,7 +238,8 @@ class StorageService {
   static int _calculatePlayerLevel(Map playerData) {
     // Simple level calculation based on skills
     final skills = Map<String, dynamic>.from(playerData['skills'] ?? {});
-    final totalSkillPoints = skills.values.fold<int>(0, (sum, value) => sum + (value as int? ?? 0));
+    final totalSkillPoints =
+        skills.values.fold<int>(0, (sum, value) => sum + (value as int? ?? 0));
     return (totalSkillPoints / 10).floor() + 1;
   }
 
@@ -187,13 +250,24 @@ class StorageService {
     required List<InventoryItem> inventory,
     Map<String, dynamic>? marketData,
   }) async {
-    await saveGame(
-      player: player,
-      gameState: gameState,
-      inventory: inventory,
-      marketData: marketData,
-      saveSlot: 'autosave',
-    );
+    try {
+      await saveGame(
+        player: player,
+        gameState: gameState,
+        inventory: inventory,
+        marketData: marketData,
+        saveSlot: 'autosave',
+      );
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('StorageService: auto-save failed -> $e');
+      }
+      throw StorageException(
+        'Auto-save failed to persist data.',
+        cause: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   // Close all boxes (call on app termination)
@@ -238,6 +312,22 @@ class SaveMetadata {
     required this.lastSaved,
     required this.playerLevel,
   });
+}
+
+class StorageException implements Exception {
+  StorageException(this.message, {this.cause, this.stackTrace});
+
+  final String message;
+  final Object? cause;
+  final StackTrace? stackTrace;
+
+  @override
+  String toString() {
+    if (cause == null) {
+      return 'StorageException: $message';
+    }
+    return 'StorageException: $message (cause: $cause)';
+  }
 }
 
 // Hive type adapters

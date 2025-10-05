@@ -104,20 +104,98 @@ class PlayerNotifier extends StateNotifier<Player> {
     );
   }
 
-
   void addReputation(int amount) {
     // Add to overall reputation - for now, add to Athens
     updateReputation('athens', amount);
   }
 
+  // Inventory management
+  void addItem(String itemId, int quantity) {
+    final currentQuantity = state.inventory[itemId] ?? 0;
+    state = state.copyWith(
+      inventory: {...state.inventory, itemId: currentQuantity + quantity},
+    );
+  }
+
+  void removeItem(String itemId, int quantity) {
+    final currentQuantity = state.inventory[itemId] ?? 0;
+    if (currentQuantity >= quantity) {
+      final newQuantity = currentQuantity - quantity;
+      final newInventory = {...state.inventory};
+      if (newQuantity <= 0) {
+        newInventory.remove(itemId);
+      } else {
+        newInventory[itemId] = newQuantity;
+      }
+      state = state.copyWith(inventory: newInventory);
+    }
+  }
+
+  int getItemQuantity(String itemId) {
+    return state.inventory[itemId] ?? 0;
+  }
+
+  // Equipment management
+  void equipItem(String slot, String itemId) {
+    state = state.copyWith(
+      equippedItems: {...state.equippedItems, slot: itemId},
+    );
+  }
+
+  void unequipItem(String slot) {
+    final newEquipped = {...state.equippedItems};
+    newEquipped.remove(slot);
+    state = state.copyWith(equippedItems: newEquipped);
+  }
+
+  String? getEquippedItem(String slot) {
+    return state.equippedItems[slot];
+  }
+
+  // Consumable usage
+  void consumeItem(String itemId, Map<String, dynamic>? effects) {
+    if (getItemQuantity(itemId) > 0) {
+      removeItem(itemId, 1);
+
+      // Apply effects
+      if (effects != null) {
+        if (effects['health'] != null) {
+          final newHealth = (state.health + (effects['health'] as int)).clamp(0, 100);
+          state = state.copyWith(health: newHealth);
+        }
+        if (effects['energy'] != null) {
+          final newEnergy = (state.energy + (effects['energy'] as int)).clamp(0, 100);
+          state = state.copyWith(energy: newEnergy);
+        }
+        if (effects['reputation'] != null) {
+          addReputation(effects['reputation'] as int);
+        }
+      }
+    }
+  }
+
+  // Achievement management
+  void unlockAchievement(String achievementId) {
+    if (!state.unlockedAchievements.contains(achievementId)) {
+      state = state.copyWith(
+        unlockedAchievements: [...state.unlockedAchievements, achievementId],
+      );
+    }
+  }
+
+  bool hasAchievement(String achievementId) {
+    return state.unlockedAchievements.contains(achievementId);
+  }
+
   int _getStartingDrachmae(CharacterClass characterClass) {
+    // Player starts poor to create motivation to engage with economy
     switch (characterClass) {
       case CharacterClass.merchant:
-        return 150; // Merchants start with more money
+        return 20; // Merchants start with slightly more
       case CharacterClass.scholar:
-        return 100; // Balanced starting amount
+        return 15; // Standard poor starting amount
       case CharacterClass.warrior:
-        return 75; // Warriors start with less money but better survival
+        return 10; // Warriors start poorest
     }
   }
 
